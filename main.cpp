@@ -240,8 +240,22 @@ int main() {
         }
         std::cout << endl;
     }
+
     std::cout << "Calculated Square = " << GeneralSquare << "<->";
     GeneralSquare = PolygonSquare(points);
     std::cout << "Real Square = " << GeneralSquare << endl;
+
+    std::cout << "_________Average Phi_________" << endl;
+    double porosity;
+    for (int i = 0; i < GRIDNUMBER_X + 1; i++) {
+        for (int j = 0; j < GRIDNUMBER_Y + 1; j++) {
+            porosity = (Grid[i][j].Square * 0.2 + ((GridStep.x * GridStep.y - Grid[i][j].Square) * 0.1)) / GridStep.x * GridStep.y;
+            std::cout << std::setw(9) << porosity;
+        }
+        std::cout << endl;
+    }
+    std::cout << "Phi in = " << 0.2 << "<->";
+    std::cout << "Phi out = " << 0.1;
+    
     return 0;
 }
