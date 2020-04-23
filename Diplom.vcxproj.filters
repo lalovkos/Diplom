@@ -26,5 +26,25 @@
     <Text Include="Points.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="Grid.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Square.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Porosity.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Stats.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="GridScheme.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

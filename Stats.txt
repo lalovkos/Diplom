@@ -1,0 +1,3 @@
+CalculatedSquare = 5.98
+RealSquare = 6
+TimePassed = 3.5677
