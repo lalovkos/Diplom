@@ -11,7 +11,7 @@
 
 #define x first
 #define y second
-#define BreakKoeff 10
+#define BreakKoeff 1000
 #define GlobalPhi 0.4
 #define H 10
 
@@ -181,13 +181,20 @@ int main() {
         for (int i = 0; i < BreakKoeff; i++) {
             for (int j = 0; j < BreakKoeff; j++) {
                 int squarenumber = 0;
-                for (int figurenumber = 0; figurenumber < Figures.size(); figurenumber++) {
-                    if (PointInsidePolygon(Figures[figurenumber].points, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y })) {
-                        squarenumber = figurenumber + 1;
-                        break;
+                //Переделать
+                if (PointInsidePolygon(ElementPolygon, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y }))
+                {
+                    for (int figurenumber = 0; figurenumber < Figures.size(); figurenumber++) {
+
+                        if (PointInsidePolygon(Figures[figurenumber].points, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y })) {
+                            squarenumber = figurenumber + 1;
+                            break;
+                        }
+
                     }
+                    Square[squarenumber].Square += Step.x * Step.y;
                 }
-                Square[squarenumber].Square += Step.x * Step.y;
+   
             }
         }
 
@@ -196,18 +203,24 @@ int main() {
         for (SquareSt SquarePart : Square) {
             porosity += SquarePart.Square * SquarePart.Phi;
             calcsq += SquarePart.Square;
+            
         }
 
         porosity /= PolygonSquare(ElementPolygon);
 
-        *PorosityFile << porosity << endl;
-
+        *PorosityFile << "Average Phi = "<< porosity << endl;
+        int i = 0;
+        for (SquareSt SquarePart : Square) {
+            *StatsFile << "Square figure " << i << "=" << SquarePart.Square << endl;
+            i++;
+        }
         *StatsFile << "CalculatedSquare = " << calcsq << endl;
+        *StatsFile << "CalculatedVolume = " << calcsq*H << endl;
         *StatsFile << "RealSquare = " << PolygonSquare(ElementPolygon) << endl;
-        *StatsFile << "Square Difference = " << 100 - ( calcsq / PolygonSquare(ElementPolygon) / 100) << endl;
+        *StatsFile << "Square Difference = " << 100 - ( calcsq / (PolygonSquare(ElementPolygon) / 100)) << endl;
         *StatsFile << "SplitKoef = " << BreakKoeff << endl;
         *StatsFile << "TimePassed = " << TimePassed.getTime() << endl;
-        *StatsFile << "-------" << endl;
+        *StatsFile << "--------------------------------------------------------" << endl;
 
     }
     return 0;

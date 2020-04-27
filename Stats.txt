@@ -1,24 +1,27 @@
+Square figure 0=0
+Square figure 1=0.499523
+CalculatedSquare = 0.499523
+CalculatedVolume = 4.99523
+RealSquare = 0.5
+Square Difference = 0.0954
+SplitKoef = 1000
+TimePassed = 6.23348
+--------------------------------------------------------
+Square figure 0=0
+Square figure 1=1
 CalculatedSquare = 1
+CalculatedVolume = 10
 RealSquare = 1
-Square Difference = 99.99
-SplitKoef = 10
-TimePassed = 0.0027955
--------
-CalculatedSquare = 1
-RealSquare = 1
-Square Difference = 99.99
-SplitKoef = 10
-TimePassed = 0.0042364
--------
-CalculatedSquare = 1
-RealSquare = 1
-Square Difference = 99.99
-SplitKoef = 10
-TimePassed = 0.0061869
--------
-CalculatedSquare = 1
-RealSquare = 1
-Square Difference = 99.99
-SplitKoef = 10
-TimePassed = 0.0068847
--------
+Square Difference = 1.29191e-09
+SplitKoef = 1000
+TimePassed = 12.3026
+--------------------------------------------------------
+Square figure 0=0
+Square figure 1=0.499712
+CalculatedSquare = 0.499712
+CalculatedVolume = 4.99712
+RealSquare = 0.5
+Square Difference = 0.0576
+SplitKoef = 1000
+TimePassed = 19.0175
+--------------------------------------------------------

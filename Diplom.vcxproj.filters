@@ -38,9 +38,6 @@
     <Text Include="Stats.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="GridScheme.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Timer.h">
