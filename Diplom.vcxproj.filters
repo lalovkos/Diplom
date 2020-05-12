@@ -21,6 +21,9 @@
     <ClCompile Include="PointsCrossing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Figure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Points.txt">
@@ -36,6 +39,9 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="Stats.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Log.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

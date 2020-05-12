@@ -135,93 +135,117 @@ std::vector<Figure> InputFigures(const char* filename) {
 
 //Основная программа
 int main() {
+    ofstream* LogFile = OpenFileForWriting("Log.txt");
+    try{ 
+        Timer TimePassed;
 
-    Timer TimePassed;
+        Grid GeneralGrid = InputGrid("Grid.txt");
+        std::vector<Figure> Figures = InputFigures("Points.txt");
+        ofstream* StatsFile = OpenFileForWriting("Stats.txt");
+        ofstream* PorosityFile = OpenFileForWriting("Porosity.txt");
+        ofstream* SquareFile = OpenFileForWriting("Square.txt");
+        ofstream* SchemeFile = OpenFileForWriting("GridScheme.txt");
 
-    Grid GeneralGrid = InputGrid("Grid.txt");
-    std::vector<Figure> Figures = InputFigures("Points.txt");
-    ofstream* StatsFile = OpenFileForWriting("Stats.txt");
-    ofstream* PorosityFile = OpenFileForWriting("Porosity.txt");
-    ofstream* SquareFile = OpenFileForWriting("Square.txt");
-    ofstream* SchemeFile = OpenFileForWriting("GridScheme.txt");
+        vector<SquareSt> Square; //Вычисляемая площадь
 
-    vector<SquareSt> Square; //Вычисляемая площадь
+        //Глобальный Phi
+        Square.push_back({ 0,GeneralGrid.Phi });
+        //Количество разных площадей потенциально в каждом КЭ с их показателями Phi
+        for (int i = 0; i < Figures.size(); i++)
+            Square.push_back({ 0,Figures[i].Phi });
 
-    //Глобальный Phi
-    Square.push_back({ 0,GeneralGrid.Phi });
-    //Количество разных площадей потенциально в каждом КЭ с их показателями Phi
-    for (int i = 0; i < Figures.size(); i++)
-        Square.push_back({ 0,Figures[i].Phi });
+        //Главный цикл по КЭ
+        for (std::vector<int> CurrentElement : GeneralGrid.Elements) {
+            std::vector<std::pair<double, double>> ElementPolygon;
+            ElementPolygon.clear();
 
-    //Главный цикл по КЭ
-    for (std::vector<int> CurrentElement : GeneralGrid.Elements) {
-    std::vector<std::pair<double, double>> ElementPolygon;
-        ElementPolygon.clear();
+            //Формируем полигон КЭ, а заодно считаем его опоясывающий прямогоугольник
+            std::pair<double, double> MinPoint = { 100000000,100000000 }, MaxPoint = { 0.000000001,0.000000001 }; //Минимальная, максимальная точки элемента
+            for (int i : CurrentElement) {
+                ElementPolygon.push_back(GeneralGrid.Setka[i]);
+                if (GeneralGrid.Setka[i].x < MinPoint.x) MinPoint.x = GeneralGrid.Setka[i].x;
+                else if (GeneralGrid.Setka[i].x > MaxPoint.x) MaxPoint.x = GeneralGrid.Setka[i].x;
 
-        //Формируем полигон КЭ, а заодно считаем его опоясывающий прямогоугольник
-        std::pair<double, double> MinPoint = { 10000,10000 }, MaxPoint = { 0.00001,0.00001 }; //Минимальная, максимальная точки элемента
-        for (int i : CurrentElement) {
-            ElementPolygon.push_back(GeneralGrid.Setka[i]);
-            if (GeneralGrid.Setka[i].x < MinPoint.x) MinPoint.x = GeneralGrid.Setka[i].x;
-            else if (GeneralGrid.Setka[i].x > MaxPoint.x) MaxPoint.x = GeneralGrid.Setka[i].x;
-
-            if (GeneralGrid.Setka[i].y < MinPoint.y) MinPoint.y = GeneralGrid.Setka[i].y;
-            else if (GeneralGrid.Setka[i].y > MaxPoint.y) MaxPoint.y = GeneralGrid.Setka[i].y;
-        }
-
-
-        //Обнуляем суммарные площади фигур на КЭ
-        for (int i = 0; i < Figures.size() + 1; i++)
-            Square[i].Square = 0;
-
-        std::pair<double, double> CurrentCell; //Текущие координаты ячейки
-        std::pair<double, double> Step = { ((MaxPoint.x - MinPoint.x) / BreakKoeff),((MaxPoint.y - MinPoint.y) / BreakKoeff) }; //Размер шага на КЭ
-
-        //Разбиваем на ячейки и опрашиваем фигуры(их необходимо отсортировать)
-        for (int i = 0; i < BreakKoeff; i++) {
-            for (int j = 0; j < BreakKoeff; j++) {
-                int squarenumber = 0;
-                //Переделать
-                if (PointInsidePolygon(ElementPolygon, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y }))
-                {
-                    for (int figurenumber = 0; figurenumber < Figures.size(); figurenumber++) {
-
-                        if (PointInsidePolygon(Figures[figurenumber].points, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y })) {
-                            squarenumber = figurenumber + 1;
-                            break;
-                        }
-
-                    }
-                    Square[squarenumber].Square += Step.x * Step.y;
-                }
-   
+                if (GeneralGrid.Setka[i].y < MinPoint.y) MinPoint.y = GeneralGrid.Setka[i].y;
+                else if (GeneralGrid.Setka[i].y > MaxPoint.y) MaxPoint.y = GeneralGrid.Setka[i].y;
             }
+
+
+            //Обнуляем суммарные площади фигур на КЭ
+            for (int i = 0; i < Figures.size() + 1; i++)
+                Square[i].Square = 0;
+
+            std::pair<double, double> CurrentCell; //Текущие координаты ячейки
+            std::pair<double, double> Step = { ((MaxPoint.x - MinPoint.x) / BreakKoeff),((MaxPoint.y - MinPoint.y) / BreakKoeff) }; //Размер шага на КЭ
+
+            //Разбиваем на ячейки и опрашиваем фигуры(их необходимо отсортировать)
+            for (int i = 0; i < BreakKoeff; i++) {
+                for (int j = 0; j < BreakKoeff; j++) {
+                    int squarenumber = 0;
+                    //Переделать
+                    if (PointInsidePolygon(ElementPolygon, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y }))
+                    {
+                        for (int figurenumber = 0; figurenumber < Figures.size(); figurenumber++) {
+
+                            if (PointInsidePolygon(Figures[figurenumber].points, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y })) {
+                                squarenumber = figurenumber + 1;
+                                break;
+                            }
+
+                        }
+                        Square[squarenumber].Square += Step.x * Step.y;
+                    }
+
+                }
+            }
+
+            //Считаем получившуюся суммарную пористость и площадь КЭ
+            double porosity = 0, calcsq = 0;
+            for (SquareSt SquarePart : Square) {
+                porosity += SquarePart.Square * SquarePart.Phi;
+                calcsq += SquarePart.Square;
+
+            }
+
+            porosity /= PolygonSquare(ElementPolygon);
+
+            *PorosityFile << "Average Phi = " << porosity << endl;
+            int i = 0;
+            for (SquareSt SquarePart : Square) {
+                *StatsFile << "Square figure " << i << "=" << SquarePart.Square << endl;
+                i++;
+            }
+            *StatsFile << "CalculatedSquare = " << calcsq << endl;
+            *StatsFile << "CalculatedVolume = " << calcsq * H << endl;
+            *StatsFile << "RealSquare = " << PolygonSquare(ElementPolygon) << endl;
+            *StatsFile << "Square Difference = " << 100 - (calcsq / (PolygonSquare(ElementPolygon) / 100)) << endl;
+            *StatsFile << "SplitKoef = " << BreakKoeff << endl;
+            *StatsFile << "TimePassed = " << TimePassed.getTime() << endl;
+            *StatsFile << "--------------------------------------------------------" << endl;
+
+        }
+    }
+    catch (int ErrorCode) {
+        switch (ErrorCode) {
+        case 1: {
+            std::cout << "Error in parameters" << std::endl;
+            break; 
         }
 
-        //Считаем получившуюся суммарную пористость и площадь КЭ
-        double porosity = 0, calcsq = 0;
-        for (SquareSt SquarePart : Square) {
-            porosity += SquarePart.Square * SquarePart.Phi;
-            calcsq += SquarePart.Square;
-            
+        case 2: {
+            std::cout << "Error in figure parameters" << std::endl;
+            break; 
         }
 
-        porosity /= PolygonSquare(ElementPolygon);
-
-        *PorosityFile << "Average Phi = "<< porosity << endl;
-        int i = 0;
-        for (SquareSt SquarePart : Square) {
-            *StatsFile << "Square figure " << i << "=" << SquarePart.Square << endl;
-            i++;
+        case 3: {
+            std::cout << "File error" << std::endl;
+            break;
         }
-        *StatsFile << "CalculatedSquare = " << calcsq << endl;
-        *StatsFile << "CalculatedVolume = " << calcsq*H << endl;
-        *StatsFile << "RealSquare = " << PolygonSquare(ElementPolygon) << endl;
-        *StatsFile << "Square Difference = " << 100 - ( calcsq / (PolygonSquare(ElementPolygon) / 100)) << endl;
-        *StatsFile << "SplitKoef = " << BreakKoeff << endl;
-        *StatsFile << "TimePassed = " << TimePassed.getTime() << endl;
-        *StatsFile << "--------------------------------------------------------" << endl;
 
+        default: {std::cout << std::endl << "+++++++++++++++++++++++++++++" << "Unknown exeption = " << ErrorCode << std::endl; break; }
+        }
+        *LogFile << ErrorCode << "Exception thrown" << std::endl;
+        return ErrorCode;
     }
     return 0;
 }
@@ -254,6 +278,7 @@ double CalculateBreakingSquare(const std::vector<std::pair<double, double>> Elem
     }
     return Square;
 }
+    
 
 //Определение координат точек пересечения двух отрезков
 //точки a и b концы первого отрезка c и d второго

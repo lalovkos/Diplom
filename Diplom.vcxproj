@@ -138,11 +138,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Figure.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PointsCrossing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Grid.txt" />
+    <Text Include="Log.txt" />
     <Text Include="Points.txt" />
     <Text Include="Porosity.txt" />
     <Text Include="Square.txt" />
