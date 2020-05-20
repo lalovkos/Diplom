@@ -5,29 +5,21 @@
 #include <functional>
 #include <iomanip>
 #include <math.h>
+#include "Figure.cpp"
 #include <clocale>  
 #include "Timer.h"
 #include <time.h>
 
-#define x first
-#define y second
-#define BreakKoeff 1000
-#define GlobalPhi 0.4
-#define H 10
+#define BreakKoeff 10
 
 using namespace std;
 
-struct Grid {
-    std::vector<std::pair<double, double>> Setka;
-    std::vector<std::vector<int>> Elements;
-    double Phi = 0.2;
-};
+std::ofstream LogFile; //Глобальный файл логов
 
-struct Figure {
-    std::vector<std::pair<double, double>> points;
-    int depth = 0;
-    double Phi = 0.1;
-    std::pair<double, double> MinPoint = { 0,0 }, MaxPoint = {1,1};
+struct Grid {
+    std::vector<Point> Setka;
+    std::vector<std::vector<int>> Elements;
+    double Phi;
 };
 
 struct SquareSt {
@@ -35,38 +27,12 @@ struct SquareSt {
     double Phi;
 };
 
-//Открытие файла для считывания и его проверки
-std::ofstream* OpenFileForWriting(const char* filename) {
-    ofstream* stream = new ofstream(filename);
-    //Тут будут проверки состояния файла
-    return stream;
-}
 
-//Считаем площадь произвольного многоугольника
-double PolygonSquare(const std::vector<std::pair<double, double>> polygon) {
-    double r = 0;
-    for (int i = 0; i < polygon.size(); i++)
-        r += (polygon[(i + 1) % polygon.size()].x - polygon[i].x) * (polygon[i].y + polygon[(i + 1) % polygon.size()].y);
-    return abs(r / 2);
-}
-
-//Проверка на принадлежность точки нашему многоугольнику
-bool PointInsidePolygon(const std::vector<std::pair<double, double>> polygon, std::pair<double, double> point) {
-    bool result = false;
-    int j = polygon.size() - 1;
-    for (int i = 0; i < polygon.size(); i++) {
-        if ((polygon[i].y < point.y && polygon[j].y >= point.y || polygon[j].y < point.y && polygon[i].y >= point.y) &&
-            (polygon[i].x + (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) * (polygon[j].x - polygon[i].x) < point.x))
-            result = !result;
-        j = i;
-    }
-    return result;
-}
-
+//TODO: Добавить ошибки и try
 //Ввод сетки
 Grid InputGrid(const char* filename) {
     Grid tmpGrid;
-    std::pair<double, double> tmppoint;
+    Point tmppoint;
     std::vector<int> tmpvector;
     ifstream gridfile(filename);
     if (gridfile.is_open()) {
@@ -75,6 +41,7 @@ Grid InputGrid(const char* filename) {
         for (int i = 0; i < nodecount; i++) {
             gridfile >> tmppoint.x;
             gridfile >> tmppoint.y;
+            gridfile >> tmppoint.z;
             tmpGrid.Setka.push_back(tmppoint);
         }
         int elementscount;
@@ -99,57 +66,74 @@ Grid InputGrid(const char* filename) {
 //Ввод фигур
 std::vector<Figure> InputFigures(const char* filename) {
     ifstream figuresfile(filename);
-    char more = '#';
+   
     std::vector<Figure> tmpvector;
-    Figure CurrentFigure;
-    int numberofpoints;
+    std::vector<Point> topfigurepoints, bottomfigurepoints;
+
     if (figuresfile.is_open()) {
-        figuresfile >> more;
-        while (more == '#') {
-            figuresfile >> numberofpoints;
-            if (numberofpoints != 0) {
+        while (!figuresfile.eof()) {
+            int numberofpoints;
+            double Phi;
+            int Order;
+            if ((figuresfile >> numberofpoints) && (numberofpoints != 0)) {
                 for (int i = 0; i < numberofpoints; i++) {
-                    std::pair<double, double> tmppair;
-                    figuresfile >> tmppair.x;
-                    figuresfile >> tmppair.y;
-                    CurrentFigure.points.push_back(tmppair);
-
-                    if (tmppair.x < CurrentFigure.MinPoint.x) CurrentFigure.MinPoint.x = tmppair.x;
-                    else if (tmppair.x > CurrentFigure.MaxPoint.x) CurrentFigure.MaxPoint.x = tmppair.x;
-
-                    if (tmppair.y < CurrentFigure.MinPoint.y) CurrentFigure.MinPoint.y = tmppair.y;
-                    else if (tmppair.y > CurrentFigure.MaxPoint.y) CurrentFigure.MaxPoint.y = tmppair.y;
+                    Point tmppoint;
+                    if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y) || !(figuresfile >> tmppoint.z)) {
+                        LogFile << "Mistake in Points.txt" << "Figures point is not a number" << std::endl;
+                        throw 2;
+                    }
+                    topfigurepoints.push_back(tmppoint);
                 }
-                figuresfile >> CurrentFigure.Phi;
-                figuresfile >> CurrentFigure.depth;
+                for (int i = 0; i < numberofpoints; i++) {
+                    Point tmppoint;
+                    if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y) || !(figuresfile >> tmppoint.z)) {
+                        LogFile << "Mistake in Points.txt" << "Figures point is not a number" << std::endl;
+                        throw 2;
+                    }
+                    bottomfigurepoints.push_back(tmppoint);
+                }
+                figuresfile >> Phi;
+                figuresfile >> Order;
+
             }
-            tmpvector.push_back(CurrentFigure);
-            CurrentFigure.points.clear();
-            figuresfile >> more;
+            else {
+                LogFile << "Mistake in Points.txt" << "Figures number is not a number or has 0 value" << std::endl;
+                throw 2;
+            }
+            tmpvector.push_back(Figure(topfigurepoints,bottomfigurepoints,Phi,Order));
+            topfigurepoints.clear();
+            bottomfigurepoints.clear();
         }
+    }
+    else {
+        LogFile << "Points.txt cannot be open" << std::endl;
+
     }
     figuresfile.close();
     return tmpvector;
 }
 
-
 //Основная программа
 int main() {
-    ofstream* LogFile = OpenFileForWriting("Log.txt");
+
     try{ 
         Timer TimePassed;
-
         Grid GeneralGrid = InputGrid("Grid.txt");
+        LogFile.open("Log.txt");
         std::vector<Figure> Figures = InputFigures("Points.txt");
-        ofstream* StatsFile = OpenFileForWriting("Stats.txt");
-        ofstream* PorosityFile = OpenFileForWriting("Porosity.txt");
-        ofstream* SquareFile = OpenFileForWriting("Square.txt");
-        ofstream* SchemeFile = OpenFileForWriting("GridScheme.txt");
+        std::ofstream StatsFile;
+        std::ofstream PorosityFile;
+        std::ofstream SquareFile;
+        std::ofstream SchemeFile;
+        StatsFile.open("Stats.txt");
+        PorosityFile.open("Porosity.txt");
+        SquareFile.open("Square.txt");
+        SchemeFile.open("Porosity.txt");
 
-        vector<SquareSt> Square; //Вычисляемая площадь
-
+        std::vector<Grid> Volume;
         //Глобальный Phi
-        Square.push_back({ 0,GeneralGrid.Phi });
+        Volume.push_back({ 0,GeneralGrid.Phi });
+
         //Количество разных площадей потенциально в каждом КЭ с их показателями Phi
         for (int i = 0; i < Figures.size(); i++)
             Square.push_back({ 0,Figures[i].Phi });
@@ -169,7 +153,6 @@ int main() {
                 if (GeneralGrid.Setka[i].y < MinPoint.y) MinPoint.y = GeneralGrid.Setka[i].y;
                 else if (GeneralGrid.Setka[i].y > MaxPoint.y) MaxPoint.y = GeneralGrid.Setka[i].y;
             }
-
 
             //Обнуляем суммарные площади фигур на КЭ
             for (int i = 0; i < Figures.size() + 1; i++)
@@ -215,6 +198,7 @@ int main() {
                 *StatsFile << "Square figure " << i << "=" << SquarePart.Square << endl;
                 i++;
             }
+
             *StatsFile << "CalculatedSquare = " << calcsq << endl;
             *StatsFile << "CalculatedVolume = " << calcsq * H << endl;
             *StatsFile << "RealSquare = " << PolygonSquare(ElementPolygon) << endl;
@@ -228,7 +212,7 @@ int main() {
     catch (int ErrorCode) {
         switch (ErrorCode) {
         case 1: {
-            std::cout << "Error in parameters" << std::endl;
+            std::cout << "Error in element parameters" << std::endl;
             break; 
         }
 
@@ -237,10 +221,11 @@ int main() {
             break; 
         }
 
-        case 3: {
-            std::cout << "File error" << std::endl;
+        case 404: {
+            std::cout << "Can't open file" << std::endl;
             break;
         }
+        
 
         default: {std::cout << std::endl << "+++++++++++++++++++++++++++++" << "Unknown exeption = " << ErrorCode << std::endl; break; }
         }
@@ -296,6 +281,27 @@ double CalculateTriangleSquare(const std::pair<double, double> FirstPoint, const
     return sqrt(p * (p - Length(FirstPoint, SecondPoint)) * (p - Length(FirstPoint, ThirdPoint)) * (p - Length(SecondPoint, ThirdPoint)));
 }
 
+
+//Считаем площадь произвольного многоугольника
+double PolygonSquare(const std::vector<std::pair<double, double>> polygon) {
+    double r = 0;
+    for (int i = 0; i < polygon.size(); i++)
+        r += (polygon[(i + 1) % polygon.size()].x - polygon[i].x) * (polygon[i].y + polygon[(i + 1) % polygon.size()].y);
+    return abs(r / 2);
+}
+
+//Проверка на принадлежность точки нашему многоугольнику
+//bool PointInsidePolygon(const std::vector<std::pair<double, double>> polygon, std::pair<double, double> point) {
+//    bool result = false;
+//    int j = polygon.size() - 1;
+//    for (int i = 0; i < polygon.size(); i++) {
+//        if ((polygon[i].y < point.y && polygon[j].y >= point.y || polygon[j].y < point.y && polygon[i].y >= point.y) &&
+//            (polygon[i].x + (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) * (polygon[j].x - polygon[i].x) < point.x))
+//            result = !result;
+//        j = i;
+//    }
+//    return result;
+//}
 
 //if (node[i][j] && node[i + 1][j + 1] && node[i][j + 1] && node[i + 1][j]) //Если все узлы внутри - площадь вся находится в многоугольнике
   //    Grid[i][j].Square = GridStep.x * GridStep.y;
