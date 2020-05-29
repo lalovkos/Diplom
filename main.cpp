@@ -1,16 +1,17 @@
-#include <iostream>
-#include <fstream>
-#include <conio.h>
-#include <vector>
-#include <functional>
 #include <iomanip>
-#include <math.h>
-#include "Figure.cpp"
+#include "Figure.h"
 #include <clocale>  
 #include "Timer.h"
+#include "Point.h"
+#include "Utility.h"
 #include <time.h>
 
 #define BreakKoeff 10
+#define GridInputFileName "Grid.txt"
+#define FiguresInputFileName "Points.txt"
+#define LogFileName "Log.txt"
+#define PorosityFileName "Porosity.txt"
+#define ResultsFileName "Stats.txt"
 
 using namespace std;
 
@@ -22,13 +23,12 @@ struct Grid {
     double Phi;
 };
 
-struct SquareSt {
-    double Square;
+struct VolumeSt {
+    std::vector<double> interval;
+    double Volume;
     double Phi;
 };
 
-
-//TODO: Добавить ошибки и try
 //Ввод сетки
 Grid InputGrid(const char* filename) {
     Grid tmpGrid;
@@ -37,27 +37,47 @@ Grid InputGrid(const char* filename) {
     ifstream gridfile(filename);
     if (gridfile.is_open()) {
         int  nodecount;
-        gridfile >> nodecount;
+        if (!(gridfile >> nodecount)) { 
+            LogFile << "Mistake in" << filename << " - Nodecount is not a number" << std::endl; 
+            throw 1;  
+        }
         for (int i = 0; i < nodecount; i++) {
-            gridfile >> tmppoint.x;
-            gridfile >> tmppoint.y;
-            gridfile >> tmppoint.z;
-            tmpGrid.Setka.push_back(tmppoint);
+            if (!(gridfile >> tmppoint.x) || !(gridfile >> tmppoint.y) || !(gridfile >> tmppoint.z)) { 
+                LogFile << "Mistake in" << filename << " - Node points is not a number" << std::endl;
+                throw 1; 
+            }
+            else tmpGrid.Setka.push_back(tmppoint);
         }
         int elementscount;
         int pointsincurrent;
         double node;
-        gridfile >> elementscount;
+        if (!(gridfile >> elementscount) || (elementscount <= 0)) {
+            LogFile << "Mistake in" << filename << " - Elements count is not a number or has unexpected value" << std::endl;
+            throw 1;
+        }
         for (int i = 0; i < elementscount; i++) {
-            gridfile >> pointsincurrent;
+            if (!(gridfile >> pointsincurrent) || (pointsincurrent <= 0)) {
+                LogFile << "Mistake in" << filename << " - Currents elements count is not a number or has unexpected value" << std::endl;
+                throw 1;
+            }
             for (int j = 0; j < pointsincurrent; j++) {
-                gridfile >> node;
+                if (!(gridfile >> node)) {
+                    LogFile << "Mistake in" << filename << " - Elements point is not a number" << std::endl;
+                    throw 1;
+                }
                 tmpvector.push_back(node);
             }
             tmpGrid.Elements.push_back(tmpvector);
             tmpvector.clear();
         }
-        gridfile >> tmpGrid.Phi;
+        if (!(gridfile >> tmpGrid.Phi) || (tmpGrid.Phi < 0) || (tmpGrid.Phi > 1)) {
+            LogFile << "Mistake in" << filename << " - Phi is not a number or has unexpected Value" << std::endl;
+            throw 1;
+        }
+    }
+    else {
+        LogFile << "Cannot open " << filename << std::endl;
+        throw 1;
     }
     gridfile.close();
     return tmpGrid;
@@ -75,11 +95,12 @@ std::vector<Figure> InputFigures(const char* filename) {
             int numberofpoints;
             double Phi;
             int Order;
-            if ((figuresfile >> numberofpoints) && (numberofpoints != 0)) {
+            if ((figuresfile >> numberofpoints))
+                if (numberofpoints > 0) {
                 for (int i = 0; i < numberofpoints; i++) {
                     Point tmppoint;
                     if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y) || !(figuresfile >> tmppoint.z)) {
-                        LogFile << "Mistake in Points.txt" << "Figures point is not a number" << std::endl;
+                        LogFile << "Mistake in " << filename << " - Figures point is not a number" << std::endl;
                         throw 2;
                     }
                     topfigurepoints.push_back(tmppoint);
@@ -87,208 +108,241 @@ std::vector<Figure> InputFigures(const char* filename) {
                 for (int i = 0; i < numberofpoints; i++) {
                     Point tmppoint;
                     if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y) || !(figuresfile >> tmppoint.z)) {
-                        LogFile << "Mistake in Points.txt" << "Figures point is not a number" << std::endl;
+                        LogFile << "Mistake in " << filename << " - Figures point is not a number" << std::endl;
                         throw 2;
                     }
                     bottomfigurepoints.push_back(tmppoint);
                 }
-                figuresfile >> Phi;
-                figuresfile >> Order;
+                if (!(figuresfile >> Phi)) LogFile << "Mistake in " << filename << " - Phi is not a number" << std::endl;
+                if (!(figuresfile >> Order)) LogFile << "Mistake in " << filename << " - Order is not a number" << std::endl;
 
+                tmpvector.push_back(Figure(topfigurepoints, bottomfigurepoints, Phi, Order));
+                topfigurepoints.clear();
+                bottomfigurepoints.clear();
             }
             else {
-                LogFile << "Mistake in Points.txt" << "Figures number is not a number or has 0 value" << std::endl;
+                LogFile << "Mistake in " << filename << " - Figures number is not a number or has unexpected value" << std::endl;
                 throw 2;
             }
-            tmpvector.push_back(Figure(topfigurepoints,bottomfigurepoints,Phi,Order));
-            topfigurepoints.clear();
-            bottomfigurepoints.clear();
+            
         }
     }
     else {
-        LogFile << "Points.txt cannot be open" << std::endl;
+        LogFile << "Cannot open" << filename << std::endl;
 
     }
     figuresfile.close();
     return tmpvector;
 }
 
+//Не работает
+bool PointInsideVector(std::vector<Point> vect, Point point) {
+    for (int i = 0; i < (int)vect.size() - 1; i++)
+        if (PointInsideTriangle(vect[i], vect[i + 1], vect[(int)vect.size() - 1], point)) return true;
+    return false;
+}
+
 //Основная программа
 int main() {
-
     try{ 
         Timer TimePassed;
-        Grid GeneralGrid = InputGrid("Grid.txt");
-        LogFile.open("Log.txt");
-        std::vector<Figure> Figures = InputFigures("Points.txt");
+        Grid GeneralGrid = InputGrid(GridInputFileName);
+        LogFile.open(LogFileName);
+        std::vector<Figure> Figures = InputFigures(FiguresInputFileName);
+        std::sort(Figures.begin(),Figures.end(),greater<Figure>()); //Сортировка по приоритету(по убыванию)
+
         std::ofstream StatsFile;
         std::ofstream PorosityFile;
-        std::ofstream SquareFile;
-        std::ofstream SchemeFile;
-        StatsFile.open("Stats.txt");
-        PorosityFile.open("Porosity.txt");
-        SquareFile.open("Square.txt");
-        SchemeFile.open("Porosity.txt");
+        StatsFile.open(ResultsFileName);
+        PorosityFile.open(PorosityFileName);
 
-        std::vector<Grid> Volume;
-        //Глобальный Phi
-        Volume.push_back({ 0,GeneralGrid.Phi });
+        std::vector<VolumeSt> Volume;
+
+        //Глобальный Phi будет в 0 элементе
+        Volume[0].Phi = GeneralGrid.Phi;
 
         //Количество разных площадей потенциально в каждом КЭ с их показателями Phi
-        for (int i = 0; i < Figures.size(); i++)
-            Square.push_back({ 0,Figures[i].Phi });
+        for (int i = 1; i < Figures.size(); i++)
+            Volume[i].Phi = Figures[i].getPhi();
 
         //Главный цикл по КЭ
         for (std::vector<int> CurrentElement : GeneralGrid.Elements) {
-            std::vector<std::pair<double, double>> ElementPolygon;
-            ElementPolygon.clear();
+            std::vector<Point> ElementPolygon;
 
-            //Формируем полигон КЭ, а заодно считаем его опоясывающий прямогоугольник
-            std::pair<double, double> MinPoint = { 100000000,100000000 }, MaxPoint = { 0.000000001,0.000000001 }; //Минимальная, максимальная точки элемента
+            //Формируем полигон КЭ, а заодно считаем его опоясывающий куб
+            Point MinPoint, MaxPoint; //Минимальная, максимальная точки элемента
             for (int i : CurrentElement) {
+                i--;
                 ElementPolygon.push_back(GeneralGrid.Setka[i]);
                 if (GeneralGrid.Setka[i].x < MinPoint.x) MinPoint.x = GeneralGrid.Setka[i].x;
                 else if (GeneralGrid.Setka[i].x > MaxPoint.x) MaxPoint.x = GeneralGrid.Setka[i].x;
 
                 if (GeneralGrid.Setka[i].y < MinPoint.y) MinPoint.y = GeneralGrid.Setka[i].y;
                 else if (GeneralGrid.Setka[i].y > MaxPoint.y) MaxPoint.y = GeneralGrid.Setka[i].y;
+
+                if (GeneralGrid.Setka[i].z < MinPoint.z) MinPoint.z = GeneralGrid.Setka[i].z;
+                else if (GeneralGrid.Setka[i].z > MaxPoint.z) MaxPoint.z = GeneralGrid.Setka[i].z;
             }
 
             //Обнуляем суммарные площади фигур на КЭ
             for (int i = 0; i < Figures.size() + 1; i++)
-                Square[i].Square = 0;
+                Volume[i].Volume = 0;
 
-            std::pair<double, double> CurrentCell; //Текущие координаты ячейки
-            std::pair<double, double> Step = { ((MaxPoint.x - MinPoint.x) / BreakKoeff),((MaxPoint.y - MinPoint.y) / BreakKoeff) }; //Размер шага на КЭ
+            Point Step = { ((MaxPoint.x - MinPoint.x) / BreakKoeff),((MaxPoint.y - MinPoint.y) / BreakKoeff),((MaxPoint.z - MinPoint.z) / BreakKoeff) }; //Размер шага на КЭ
+            double StepSquare = Step.y * Step.z;    
+            int halfElementsize = (int)(ElementPolygon.size() / 2);
 
-            //Разбиваем на ячейки и опрашиваем фигуры(их необходимо отсортировать)
+            //Двойная проверка?
+
+            //Разбиваем на "столбы" и работаем с ними
             for (int i = 0; i < BreakKoeff; i++) {
                 for (int j = 0; j < BreakKoeff; j++) {
-                    int squarenumber = 0;
-                    //Переделать
-                    if (PointInsidePolygon(ElementPolygon, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y }))
-                    {
-                        for (int figurenumber = 0; figurenumber < Figures.size(); figurenumber++) {
+                   
+                    //Формируем рабочую прямую параллельную оси x
+                    Point StartLine(MinPoint.x, MinPoint.y + Step.y*(i + 0.5), MinPoint.z + Step.z*(j + 0.5));
+                    Point EndLine(MinPoint.x + 1, MinPoint.y + Step.y * (i + 0.5), MinPoint.z + Step.z * (j + 0.5));
+                    //Точка пересечения
+                    Point InterPoint;
+                    for (int tfn = 0; tfn < halfElementsize; tfn++) { //TFN - TopFirstNumber //TSN - TopSecondNumber
+                        int tsn;
+                        tfn + 1 < halfElementsize ? tsn = tfn + 1 : tsn = 0;
+                        //Проверяем пересекает ли плоскость грани наш "столб"
+                        if (!PlaneIntersectLine(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn + halfElementsize], StartLine, EndLine, &InterPoint)) {
+                            //Проверяем, находится ли точка в пределах элемента
+                            if (InterPoint.x >= MinPoint.x && InterPoint.x <= MaxPoint.x)
+                                //Проверяем, находится ли точка в грани
+                                //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
+                                if (PointInsideTriangle(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn+halfElementsize],InterPoint) || (PointInsideTriangle(ElementPolygon[tsn], ElementPolygon[tfn+halfElementsize], ElementPolygon[tsn + halfElementsize],InterPoint))) {
+                                    //cout << InterPoint.ToString() << endl;
+                                    //cout << ElementPolygon[tfn].ToString() << ElementPolygon[tsn].ToString() << ElementPolygon[tfn + 4].ToString() << ElementPolygon[tsn + 4].ToString() << endl
+                                    Volume[0].interval.push_back(InterPoint.x);
+                                }
+                        }
 
-                            if (PointInsidePolygon(Figures[figurenumber].points, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y })) {
-                                squarenumber = figurenumber + 1;
-                                break;
+                    }
+                    //Получены главные интервалы внутри элемента, в которых будет считаться обьем
+                    std::sort(Volume[0].interval.begin(), Volume[0].interval.end());
+                    //Проверяем количество интервалов на четность, если нечетное, добавляем максимальную границу
+                    if (Volume[0].interval.size() % 2 != 0) Volume[0].interval.push_back(MaxPoint.x);
+
+                    std::vector<double> interval;
+                    int fignum = 0;
+                    //Обход фигур по порядку приоритета
+                    for (Figure CurFig : Figures) {
+                        fignum++;
+                        int fnp = (int)CurFig.getTopPoints().size(); //fnp - Figure number of points
+                        for (int fn = 0; fn < fnp; fn++) { //FN - FirstNumber //SN - SecondNumber
+                            int sn;
+                            fn + 1 < fnp ? sn = fn + 1 : sn = 0;
+                            //Проверяем пересекает ли плоскость граней фигуры наш "столб"
+                            if (!PlaneIntersectLine(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn],StartLine,EndLine, &InterPoint)) {
+                                //Проверяем, находится ли точка в пределах фигуры
+                                if (InterPoint.x >= CurFig.getMinMax().first.x && InterPoint.x <= CurFig.getMinMax().second.x)
+                                    //Проверяем, находится ли точка в грани
+                                    //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
+                                    if (PointInsideTriangle(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], InterPoint) || (PointInsideTriangle(CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], CurFig.getBottomPoints()[sn], InterPoint))) {
+                                        //Если точка пересечения попадает в главные интервалы добавляем ее в интервал текущей фигуры
+                                        for (int num = 0; num = Volume[0].interval.size(); num += 2) {
+                                            if (InterPoint.x > Volume[0].interval[num] && InterPoint.x < Volume[0].interval[num + 1])
+                                                Volume[fignum].interval.push_back(InterPoint.x);
+                                        }
+                                    }
                             }
 
                         }
-                        Square[squarenumber].Square += Step.x * Step.y;
+                        std::sort(Volume[fignum].interval.begin(), Volume[fignum].interval.end());
+                        if (Volume[fignum].interval.size() % 2 != 0) Volume[fignum].interval.push_back(MaxPoint.x);
                     }
 
+                    //Добавляем суммарный обьем столба в соответствующем векторе Volume
+                    //По каждой фигуре
+                    for (int i = 1; i < Volume.size(); i++) {
+                        //По интервалам фигуры
+                        for (int j = 0; j < Volume[i].interval.size(); j += 2) {
+                            //По главному интервалу
+                            for (int mn = 0; mn < Volume[0].interval.size(); mn += 2) {
+                                //Интервал фигуры внутри
+                                if ((Volume[0].interval[mn] <= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] >= Volume[i].interval[j + 1])) {
+                                    Volume[i].Volume += StepSquare * (Volume[i].interval[j + 1] - Volume[i].interval[j]);
+                                    Volume[0].interval.insert(Volume[0].interval.end() + (mn + 1), { Volume[i].interval[j], Volume[i].interval[j + 1] });
+                                    break;
+                                }
+                                //Интервал имеет границу слева
+                                else {
+                                    if ((Volume[0].interval[mn] >= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] <= Volume[i].interval[j + 1])) {
+                                        Volume[i].Volume += StepSquare * (Volume[i].interval[j + 1] - Volume[0].interval[mn]);
+                                        Volume[0].interval[mn] = Volume[i].interval[j + 1];
+                                    }
+                                    //Интервал имеет границу справа
+                                    else {
+                                        if ((Volume[0].interval[mn] <= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] <= Volume[i].interval[j + 1])) {
+                                            Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[i].interval[j]);
+                                            Volume[0].interval[mn + 1] = Volume[i].interval[j];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for (int mn = 0; mn < Volume[0].interval.size(); mn += 2)
+                        Volume[0].Volume += (Volume[0].interval[mn + 1] - Volume[0].interval[mn]) * StepSquare;
+                    for (int i = 0; i < Volume.size(); i++) {
+                        std::cout << Volume[i].Volume;
+                        Volume[i].interval.clear();
+                    }
+                    
                 }
             }
-
             //Считаем получившуюся суммарную пористость и площадь КЭ
-            double porosity = 0, calcsq = 0;
-            for (SquareSt SquarePart : Square) {
-                porosity += SquarePart.Square * SquarePart.Phi;
-                calcsq += SquarePart.Square;
+            double porosity = 0, calcVM = 0;
+            for (VolumeSt VolumePart : Volume) {
+                porosity += VolumePart.Volume * VolumePart.Phi;
+                calcVM += VolumePart.Volume;
 
             }
 
-            porosity /= PolygonSquare(ElementPolygon);
-
-            *PorosityFile << "Average Phi = " << porosity << endl;
+            PorosityFile << "Average Phi = " << porosity << endl;
             int i = 0;
-            for (SquareSt SquarePart : Square) {
-                *StatsFile << "Square figure " << i << "=" << SquarePart.Square << endl;
+            for (VolumeSt VolumePart : Volume) {
+                StatsFile << "Square figure " << i << "=" << VolumePart.Volume << endl;
                 i++;
             }
 
-            *StatsFile << "CalculatedSquare = " << calcsq << endl;
-            *StatsFile << "CalculatedVolume = " << calcsq * H << endl;
-            *StatsFile << "RealSquare = " << PolygonSquare(ElementPolygon) << endl;
-            *StatsFile << "Square Difference = " << 100 - (calcsq / (PolygonSquare(ElementPolygon) / 100)) << endl;
-            *StatsFile << "SplitKoef = " << BreakKoeff << endl;
-            *StatsFile << "TimePassed = " << TimePassed.getTime() << endl;
-            *StatsFile << "--------------------------------------------------------" << endl;
+            StatsFile << "CalculatedVolume = " << calcVM << endl;
+            //StatsFile << "Square Difference = " << 100 - (calcVM / (PolygonSquare(ElementPolygon) / 100)) << endl;
+            StatsFile << "SplitKoef = " << BreakKoeff << endl;
+            StatsFile << "TimePassed = " << TimePassed.getTime() << endl;
+            StatsFile << "--------------------------------------------------------" << endl;
 
+            ElementPolygon.clear();
         }
     }
     catch (int ErrorCode) {
         switch (ErrorCode) {
         case 1: {
             std::cout << "Error in element parameters" << std::endl;
-            break; 
+            break;
         }
 
         case 2: {
             std::cout << "Error in figure parameters" << std::endl;
-            break; 
+            break;
         }
 
         case 404: {
             std::cout << "Can't open file" << std::endl;
             break;
         }
-        
+
 
         default: {std::cout << std::endl << "+++++++++++++++++++++++++++++" << "Unknown exeption = " << ErrorCode << std::endl; break; }
         }
-        *LogFile << ErrorCode << "Exception thrown" << std::endl;
+        LogFile << ErrorCode << " Exception thrown" << std::endl;
         return ErrorCode;
     }
     return 0;
 }
 
-//Определяет расстояние между точками
-double Length(const std::pair<double, double> FirstPoint, const std::pair<double, double> SecondPoint) {
-    return sqrt((SecondPoint.x - FirstPoint.x) * (SecondPoint.x - FirstPoint.x) + (SecondPoint.y - FirstPoint.y) * (SecondPoint.y - FirstPoint.y));
-}
-
-//Метод разбивания на ячейки
-double CalculateBreakingSquare(const std::vector<std::pair<double, double>> Element, const std::vector<std::pair<double, double>> Figure, const int BreakKoef) {
-    double Square = 0; //Вычисляемая площадь    
-    std::pair<double, double> CurrentCell; //Текущие координаты ячейки
-    std::pair<double, double> MinPoint = { 0,0 }, MaxPoint = { 1,1 }; //Минимальная, максимальная точки элемента
-    for (std::pair<double, double> CurrentPoint : Element) {
-        if (CurrentPoint.x < MinPoint.x) MinPoint.x = CurrentPoint.x;
-        else if (CurrentPoint.x > MaxPoint.x) MaxPoint.x = CurrentPoint.x;
-
-        if (CurrentPoint.y < MinPoint.y) MinPoint.y = CurrentPoint.y;
-        else if (CurrentPoint.y > MaxPoint.y) MaxPoint.y = CurrentPoint.y;
-    }
-
-    std::pair<double, double> Step = { (MaxPoint.x - MinPoint.x / BreakKoef),(MaxPoint.y - MinPoint.y / BreakKoef) };
-    for (int i = 0; i < BreakKoef; i++) {
-        for (int j = 0; j < BreakKoef; j++) {
-            //0.5 потому что берется центр ячейки для опроса
-            if (PointInsidePolygon(Figure, { MinPoint.x + (i + 0.5) * Step.x,MinPoint.y + (j + 0.5) * Step.y }))
-                Square += Step.x * Step.y;
-        }
-    }
-    return Square;
-}
-    
-
-//Определение координат точек пересечения двух отрезков
-//точки a и b концы первого отрезка c и d второго
-std::pair<double, double> LineSegmentCrossing(std::pair<double, double> const a, std::pair<double, double> const b, std::pair<double, double> const c, std::pair<double, double> const d) {
-    std::pair<double, double> tmp;
-    tmp.x = -((a.x * b.y - b.x * a.y) * (d.x - c.x) - (c.x * d.y - d.x * c.y) * (b.x - a.x)) / ((a.y - b.y) * (d.x - c.x) - (c.y - d.y) * (b.x - a.x));
-    tmp.y = ((c.y - d.y) * (-tmp.x) - (c.x * d.y - d.x * c.y)) / (d.x - c.x);
-    return tmp;
-}
-
-//Возможно лучше векторное произведение
-//Вычисление площади треугольника
-double CalculateTriangleSquare(const std::pair<double, double> FirstPoint, const std::pair<double, double> SecondPoint, const std::pair<double, double> ThirdPoint) {
-    double p = (1 / 2) * Length(FirstPoint, SecondPoint) + Length(FirstPoint, ThirdPoint) + Length(SecondPoint, ThirdPoint);
-    return sqrt(p * (p - Length(FirstPoint, SecondPoint)) * (p - Length(FirstPoint, ThirdPoint)) * (p - Length(SecondPoint, ThirdPoint)));
-}
-
-
-//Считаем площадь произвольного многоугольника
-double PolygonSquare(const std::vector<std::pair<double, double>> polygon) {
-    double r = 0;
-    for (int i = 0; i < polygon.size(); i++)
-        r += (polygon[(i + 1) % polygon.size()].x - polygon[i].x) * (polygon[i].y + polygon[(i + 1) % polygon.size()].y);
-    return abs(r / 2);
-}
 
 //Проверка на принадлежность точки нашему многоугольнику
 //bool PointInsidePolygon(const std::vector<std::pair<double, double>> polygon, std::pair<double, double> point) {
