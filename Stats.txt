@@ -1,6 +1,0 @@
-Square figure 0=0
-Square figure 1=0
-CalculatedVolume = 0
-SplitKoef = 10
-TimePassed = 0.250602
---------------------------------------------------------

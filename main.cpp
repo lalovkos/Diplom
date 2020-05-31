@@ -142,6 +142,8 @@ bool PointInsideVector(std::vector<Point> vect, Point point) {
     return false;
 }
 
+
+//TODO: Добавить и привыкнуть к vector.reserve
 //Основная программа
 int main() {
     try{ 
@@ -157,13 +159,14 @@ int main() {
         PorosityFile.open(PorosityFileName);
 
         std::vector<VolumeSt> Volume;
-
+        
         //Глобальный Phi будет в 0 элементе
-        Volume[0].Phi = GeneralGrid.Phi;
+        Volume.reserve(Figures.size()+1);
+        Volume.push_back({{},0,GeneralGrid.Phi});
 
         //Количество разных площадей потенциально в каждом КЭ с их показателями Phi
-        for (int i = 1; i < Figures.size(); i++)
-            Volume[i].Phi = Figures[i].getPhi();
+        for (int i = 1; i < Figures.size()+1; i++)
+            Volume.push_back({ {}, 0, Figures[i-1].getPhi() });
 
         //Главный цикл по КЭ
         for (std::vector<int> CurrentElement : GeneralGrid.Elements) {
@@ -192,7 +195,7 @@ int main() {
             double StepSquare = Step.y * Step.z;    
             int halfElementsize = (int)(ElementPolygon.size() / 2);
 
-            //Двойная проверка?
+            //TODO: Двойная проверка?
 
             //Разбиваем на "столбы" и работаем с ними
             for (int i = 0; i < BreakKoeff; i++) {
@@ -242,8 +245,8 @@ int main() {
                                     //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
                                     if (PointInsideTriangle(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], InterPoint) || (PointInsideTriangle(CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], CurFig.getBottomPoints()[sn], InterPoint))) {
                                         //Если точка пересечения попадает в главные интервалы добавляем ее в интервал текущей фигуры
-                                        for (int num = 0; num = Volume[0].interval.size(); num += 2) {
-                                            if (InterPoint.x > Volume[0].interval[num] && InterPoint.x < Volume[0].interval[num + 1])
+                                        for (int num = 0; num < Volume[0].interval.size(); num += 2) {
+                                            if (InterPoint.x >= Volume[0].interval[num] && InterPoint.x <= Volume[0].interval[num + 1])
                                                 Volume[fignum].interval.push_back(InterPoint.x);
                                         }
                                     }
@@ -254,6 +257,7 @@ int main() {
                         if (Volume[fignum].interval.size() % 2 != 0) Volume[fignum].interval.push_back(MaxPoint.x);
                     }
 
+                    //Перенести выше
                     //Добавляем суммарный обьем столба в соответствующем векторе Volume
                     //По каждой фигуре
                     for (int i = 1; i < Volume.size(); i++) {
@@ -261,38 +265,70 @@ int main() {
                         for (int j = 0; j < Volume[i].interval.size(); j += 2) {
                             //По главному интервалу
                             for (int mn = 0; mn < Volume[0].interval.size(); mn += 2) {
+                            bool leftinter = false;
+                            bool rightinter = false;
+                                //Левый интервал внутри
+                                if ((Volume[0].interval[mn] < Volume[i].interval[j]) && (Volume[0].interval[mn + 1] > Volume[i].interval[j]))
+                                    leftinter = true;
+                                //Правый интервал внутри
+                                if ((Volume[0].interval[mn] < Volume[i].interval[j + 1]) && (Volume[0].interval[mn + 1] > Volume[i].interval[j + 1]))
+                                    rightinter = true;
+
                                 //Интервал фигуры внутри
-                                if ((Volume[0].interval[mn] <= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] >= Volume[i].interval[j + 1])) {
+                                if (leftinter && rightinter) {
+                                    if ((Volume[0].interval[mn] != Volume[i].interval[j]) && (Volume[0].interval[mn + 1] != Volume[i].interval[j + 1]))
+                                        Volume[0].interval.insert(Volume[0].interval.begin() + (mn + 1), { Volume[i].interval[j], Volume[i].interval[j + 1] });
+                                    //Полностью равно интервалу
+                                    else {
+                                        //Два раза, потому что элемент смещается
+                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                    }
                                     Volume[i].Volume += StepSquare * (Volume[i].interval[j + 1] - Volume[i].interval[j]);
-                                    Volume[0].interval.insert(Volume[0].interval.end() + (mn + 1), { Volume[i].interval[j], Volume[i].interval[j + 1] });
                                     break;
                                 }
-                                //Интервал имеет границу слева
+
+                                //Интервал наложен на правую границу
+                                else if(leftinter && !rightinter){
+                                    Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[i].interval[j]);
+                                    //Меняем правую границу
+                                    Volume[0].interval[mn+1] = Volume[i].interval[j];
+                                    j -= 2;
+                                    break;
+                                }
+
+                                //Интервал наложен на левую границу
+                                else if (!leftinter && rightinter) {
+                                    Volume[i].Volume += StepSquare * (Volume[i].interval[j+1] - Volume[0].interval[mn]);
+                                    //Меняем левую границу
+                                    Volume[0].interval[mn] = Volume[i].interval[j+1];
+                                    j -= 2;
+                                    break;
+                                }
+
+                                //Интервал наложен целиком, либо находится вне
                                 else {
+                                    //Наложен целиком
                                     if ((Volume[0].interval[mn] >= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] <= Volume[i].interval[j + 1])) {
-                                        Volume[i].Volume += StepSquare * (Volume[i].interval[j + 1] - Volume[0].interval[mn]);
-                                        Volume[0].interval[mn] = Volume[i].interval[j + 1];
-                                    }
-                                    //Интервал имеет границу справа
-                                    else {
-                                        if ((Volume[0].interval[mn] <= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] <= Volume[i].interval[j + 1])) {
-                                            Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[i].interval[j]);
-                                            Volume[0].interval[mn + 1] = Volume[i].interval[j];
-                                        }
+                                        Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[0].interval[mn]);
+                                        //Два раза, потому что элемент смещается
+                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                        j -= 2;
+                                        break;
                                     }
                                 }
-                            }
                         }
                     }
+                    //Считаем оставшийся фоновый обьем
                     for (int mn = 0; mn < Volume[0].interval.size(); mn += 2)
                         Volume[0].Volume += (Volume[0].interval[mn + 1] - Volume[0].interval[mn]) * StepSquare;
-                    for (int i = 0; i < Volume.size(); i++) {
-                        std::cout << Volume[i].Volume;
+                    for (int i = 0; i < Volume.size(); i++)
                         Volume[i].interval.clear();
-                    }
                     
                 }
             }
+
             //Считаем получившуюся суммарную пористость и площадь КЭ
             double porosity = 0, calcVM = 0;
             for (VolumeSt VolumePart : Volume) {

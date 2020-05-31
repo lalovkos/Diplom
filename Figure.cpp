@@ -2,28 +2,26 @@
 
 //—читаем опо€сывающий куб
 void Figure::UpdateMinMax() {
-    this->MinPoint = this->TopPoints[0];
-    this->MaxPoint = this->TopPoints[0];
     for (Point tmp : this->TopPoints) {
         if (tmp.x < this->MinPoint.x) this->MinPoint.x = tmp.x;
-        else if (tmp.x > this->MinPoint.x) this->MinPoint.x = tmp.x;
+        else if (tmp.x > this->MaxPoint.x) this->MaxPoint.x = tmp.x;
 
         if (tmp.y < this->MinPoint.y) this->MinPoint.y = tmp.y;
-        else if (tmp.y > this->MinPoint.y) this->MinPoint.y = tmp.y;
+        else if (tmp.y > this->MaxPoint.y) this->MaxPoint.y = tmp.y;
 
         if (tmp.z < this->MinPoint.z) this->MinPoint.z = tmp.z;
-        else if (tmp.z > this->MinPoint.z) this->MinPoint.z = tmp.z;
+        else if (tmp.z > this->MaxPoint.z) this->MaxPoint.z = tmp.z;
     }
 
     for (Point tmp : this->BottomPoints) {
         if (tmp.x < this->MinPoint.x) this->MinPoint.x = tmp.x;
-        else if (tmp.x > this->MinPoint.x) this->MinPoint.x = tmp.x;
+        else if (tmp.x > this->MaxPoint.x) this->MaxPoint.x = tmp.x;
 
         if (tmp.y < this->MinPoint.y) this->MinPoint.y = tmp.y;
-        else if (tmp.y > this->MinPoint.y) this->MinPoint.y = tmp.y;
+        else if (tmp.y > this->MaxPoint.y) this->MaxPoint.y = tmp.y;
 
         if (tmp.z < this->MinPoint.z) this->MinPoint.z = tmp.z;
-        else if (tmp.z > this->MinPoint.z) this->MinPoint.z = tmp.z;
+        else if (tmp.z > this->MaxPoint.z) this->MaxPoint.z = tmp.z;
     }
 }
 
