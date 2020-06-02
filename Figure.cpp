@@ -2,6 +2,13 @@
 
 //—читаем опо€сывающий куб
 void Figure::UpdateMinMax() {
+    this->MinPoint.x = 10000000;
+    this->MinPoint.y = 10000000;
+    this->MinPoint.z = 10000000;
+    this->MaxPoint.x = -10000000;
+    this->MaxPoint.y = -10000000;
+    this->MaxPoint.z = -10000000;
+
     for (Point tmp : this->TopPoints) {
         if (tmp.x < this->MinPoint.x) this->MinPoint.x = tmp.x;
         else if (tmp.x > this->MaxPoint.x) this->MaxPoint.x = tmp.x;
@@ -65,38 +72,27 @@ void Figure::setOrder(const int order) {
 }
 
 bool Figure::PointInside(const Point point) {
-    //bool inside = false;
-    //int j = this->TopPoints.size() - 1;
+    bool inside = false;
 
-    ////ѕроверка на попадание в опо€сывающий куб
-    //if (point.x > MaxPoint.x || point.y > MaxPoint.y || point.z > MaxPoint.z)
-    //    if (point.x < MinPoint.x || point.y < MinPoint.y || point.z < MinPoint.z)
-    //        return false;
+    //ѕроверка на попадание в опо€сывающий куб
+    if (point.x > MaxPoint.x || point.y > MaxPoint.y || point.z > MaxPoint.z)
+        if (point.x < MinPoint.x || point.y < MinPoint.y || point.z < MinPoint.z)
+            return false;
 
-    //Point InterPoint;
-    ////ѕроверка на прохождение луча боковыми гран€ми
-    //for (int i = 0; i < TopPoints.size(); i++) {
-    //    int j;
-    //    i + 1 < TopPoints.size() ? j = i + 1 : j = 0;
-    //    //ѕроверка на нахождение провер€емой точки в окрестности грани
+    Point InterPoint;
+    //ѕроверка на прохождение луча боковыми гран€ми
+    for (int i = 0; i < TopPoints.size(); i++) {
+        int j;
+        i + 1 < TopPoints.size() ? j = i + 1 : j = 0;
 
-    //    if (PlaneIntersectLine(TopPoints[i], TopPoints[j], BottomPoints[i], point, { point.x + 1000, point.y, point.z }, &InterPoint))
-    //        if (InterPoint.x > point.x)
-    //            inside = !inside;
-    //}
+        //ѕроверка на нахождение провер€емой точки в окрестности грани
+        if (!PlaneIntersectLine(TopPoints[i], TopPoints[j], BottomPoints[i], point, { point.x + 1, point.y, point.z }, &InterPoint) && (InterPoint.x >= point.x))
+                if ((PointInsideTriangle(TopPoints[i], TopPoints[j], BottomPoints[i], InterPoint)) || (PointInsideTriangle(TopPoints[j], BottomPoints[i], BottomPoints[j], InterPoint)))
+                    inside = !inside;
+    }
 
-    ////ѕроверка на прохождение луча верхней грани
-    //if (PlaneIntersectLine(TopPoints[0], TopPoints[1], TopPoints[2], point, { point.x + 1000, point.y, point.z }, &InterPoint))
-    //    if (InterPoint.x > point.x)
-    //        inside = !inside;
 
-    ////ѕроверка на прохождение луча нижней грани
-    //if (PlaneIntersectLine(BottomPoints[0], BottomPoints[1], BottomPoints[2], point, { point.x + 1000, point.y, point.z }, &InterPoint))
-    //    if (InterPoint.x > point.x)
-    //        inside = !inside;
-
-    //return inside;
-    return false;
+    return inside;
 }
 
 // онструктор по умолчанию

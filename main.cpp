@@ -6,7 +6,7 @@
 #include "Utility.h"
 #include <time.h>
 
-#define BreakKoeff 10
+#define BreakKoeff 100
 #define GridInputFileName "Grid.txt"
 #define FiguresInputFileName "Points.txt"
 #define LogFileName "Log.txt"
@@ -38,12 +38,12 @@ Grid InputGrid(const char* filename) {
     if (gridfile.is_open()) {
         int  nodecount;
         if (!(gridfile >> nodecount)) { 
-            LogFile << "Mistake in" << filename << " - Nodecount is not a number" << std::endl; 
+            LogFile << "Mistake in " << filename << " - Nodecount is not a number" << std::endl; 
             throw 1;  
         }
         for (int i = 0; i < nodecount; i++) {
             if (!(gridfile >> tmppoint.x) || !(gridfile >> tmppoint.y) || !(gridfile >> tmppoint.z)) { 
-                LogFile << "Mistake in" << filename << " - Node points is not a number" << std::endl;
+                LogFile << "Mistake in " << filename << " - Node points is not a number" << std::endl;
                 throw 1; 
             }
             else tmpGrid.Setka.push_back(tmppoint);
@@ -52,17 +52,20 @@ Grid InputGrid(const char* filename) {
         int pointsincurrent;
         double node;
         if (!(gridfile >> elementscount) || (elementscount <= 0)) {
-            LogFile << "Mistake in" << filename << " - Elements count is not a number or has unexpected value" << std::endl;
+            LogFile << "Mistake in " << filename << " - Elements count is not a number or has unexpected value" << std::endl;
+            LogFile.close();
             throw 1;
         }
         for (int i = 0; i < elementscount; i++) {
             if (!(gridfile >> pointsincurrent) || (pointsincurrent <= 0)) {
-                LogFile << "Mistake in" << filename << " - Currents elements count is not a number or has unexpected value" << std::endl;
+                LogFile << "Mistake in " << filename << " - Currents elements count is not a number or has unexpected value" << std::endl;
+                LogFile.close();
                 throw 1;
             }
             for (int j = 0; j < pointsincurrent; j++) {
                 if (!(gridfile >> node)) {
-                    LogFile << "Mistake in" << filename << " - Elements point is not a number" << std::endl;
+                    LogFile << "Mistake in " << filename << " - Elements point is not a number" << std::endl;
+                    LogFile.close();
                     throw 1;
                 }
                 tmpvector.push_back(node);
@@ -72,6 +75,7 @@ Grid InputGrid(const char* filename) {
         }
         if (!(gridfile >> tmpGrid.Phi) || (tmpGrid.Phi < 0) || (tmpGrid.Phi > 1)) {
             LogFile << "Mistake in" << filename << " - Phi is not a number or has unexpected Value" << std::endl;
+            LogFile.close();
             throw 1;
         }
     }
@@ -100,7 +104,7 @@ std::vector<Figure> InputFigures(const char* filename) {
                 for (int i = 0; i < numberofpoints; i++) {
                     Point tmppoint;
                     if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y) || !(figuresfile >> tmppoint.z)) {
-                        LogFile << "Mistake in " << filename << " - Figures point is not a number" << std::endl;
+                        LogFile << "Mistake in " << filename << " - figure point is not a number" << std::endl;
                         throw 2;
                     }
                     topfigurepoints.push_back(tmppoint);
@@ -144,12 +148,18 @@ bool PointInsideVector(std::vector<Point> vect, Point point) {
 
 
 //TODO: Добавить и привыкнуть к vector.reserve
+//TODO: Добавить закрытие всех файлов
+//TODO: Добавить НОРМАЛЬНОЕ MinMax начальные значения
+//TODO: Добавить LogFile везде
+//TODO: Испратить !PlaneInter
 //Основная программа
 int main() {
     try{ 
+        bool firstmeth = false;
+        double tick;
+        LogFile.open(LogFileName);
         Timer TimePassed;
         Grid GeneralGrid = InputGrid(GridInputFileName);
-        LogFile.open(LogFileName);
         std::vector<Figure> Figures = InputFigures(FiguresInputFileName);
         std::sort(Figures.begin(),Figures.end(),greater<Figure>()); //Сортировка по приоритету(по убыванию)
 
@@ -167,15 +177,16 @@ int main() {
         //Количество разных площадей потенциально в каждом КЭ с их показателями Phi
         for (int i = 1; i < Figures.size()+1; i++)
             Volume.push_back({ {}, 0, Figures[i-1].getPhi() });
-
+        tick = TimePassed.getTime();
+        int pos = 0;
         //Главный цикл по КЭ
         for (std::vector<int> CurrentElement : GeneralGrid.Elements) {
             std::vector<Point> ElementPolygon;
-
+            pos++;
+            
             //Формируем полигон КЭ, а заодно считаем его опоясывающий куб
-            Point MinPoint, MaxPoint; //Минимальная, максимальная точки элемента
+            Point MinPoint(100000000,100000000, 100000000), MaxPoint(-100000000, -100000000, -100000000); //Минимальная, максимальная точки элемента
             for (int i : CurrentElement) {
-                i--;
                 ElementPolygon.push_back(GeneralGrid.Setka[i]);
                 if (GeneralGrid.Setka[i].x < MinPoint.x) MinPoint.x = GeneralGrid.Setka[i].x;
                 else if (GeneralGrid.Setka[i].x > MaxPoint.x) MaxPoint.x = GeneralGrid.Setka[i].x;
@@ -192,166 +203,208 @@ int main() {
                 Volume[i].Volume = 0;
 
             Point Step = { ((MaxPoint.x - MinPoint.x) / BreakKoeff),((MaxPoint.y - MinPoint.y) / BreakKoeff),((MaxPoint.z - MinPoint.z) / BreakKoeff) }; //Размер шага на КЭ
-            double StepSquare = Step.y * Step.z;    
+            double StepSquare = Step.y * Step.z;
             int halfElementsize = (int)(ElementPolygon.size() / 2);
 
-            //TODO: Двойная проверка?
-
-            //Разбиваем на "столбы" и работаем с ними
-            for (int i = 0; i < BreakKoeff; i++) {
-                for (int j = 0; j < BreakKoeff; j++) {
-                   
-                    //Формируем рабочую прямую параллельную оси x
-                    Point StartLine(MinPoint.x, MinPoint.y + Step.y*(i + 0.5), MinPoint.z + Step.z*(j + 0.5));
-                    Point EndLine(MinPoint.x + 1, MinPoint.y + Step.y * (i + 0.5), MinPoint.z + Step.z * (j + 0.5));
-                    //Точка пересечения
-                    Point InterPoint;
-                    for (int tfn = 0; tfn < halfElementsize; tfn++) { //TFN - TopFirstNumber //TSN - TopSecondNumber
-                        int tsn;
-                        tfn + 1 < halfElementsize ? tsn = tfn + 1 : tsn = 0;
-                        //Проверяем пересекает ли плоскость грани наш "столб"
-                        if (!PlaneIntersectLine(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn + halfElementsize], StartLine, EndLine, &InterPoint)) {
-                            //Проверяем, находится ли точка в пределах элемента
-                            if (InterPoint.x >= MinPoint.x && InterPoint.x <= MaxPoint.x)
-                                //Проверяем, находится ли точка в грани
-                                //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
-                                if (PointInsideTriangle(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn+halfElementsize],InterPoint) || (PointInsideTriangle(ElementPolygon[tsn], ElementPolygon[tfn+halfElementsize], ElementPolygon[tsn + halfElementsize],InterPoint))) {
-                                    //cout << InterPoint.ToString() << endl;
-                                    //cout << ElementPolygon[tfn].ToString() << ElementPolygon[tsn].ToString() << ElementPolygon[tfn + 4].ToString() << ElementPolygon[tsn + 4].ToString() << endl
-                                    Volume[0].interval.push_back(InterPoint.x);
+            PorosityFile << ".............Elem " << pos << "..............." << endl;
+            if (firstmeth) {
+                StatsFile << "-----------------------------1 meth---------------------------" << std::endl;
+                for (int i = 0; i < BreakKoeff; i++) {
+                    for (int j = 0; j < BreakKoeff; j++) {
+                        for (int k = 0; k < BreakKoeff; k++) {
+                            int p = 0;
+                            for (Figure CurFig : Figures) {
+                                p++;
+                                if (CurFig.PointInside({ MinPoint.x + Step.x * (i + 0.5) ,MinPoint.y + Step.y * (j + 0.5), MinPoint.z + Step.z * (k + 0.5) })) {
+                                    Volume[p].Volume += StepSquare * Step.x;
+                                    p = -1;
+                                    break;
                                 }
+                            }
+                            if (p != -1) Volume[0].Volume += StepSquare * Step.x;
                         }
-
                     }
-                    //Получены главные интервалы внутри элемента, в которых будет считаться обьем
-                    std::sort(Volume[0].interval.begin(), Volume[0].interval.end());
-                    //Проверяем количество интервалов на четность, если нечетное, добавляем максимальную границу
-                    if (Volume[0].interval.size() % 2 != 0) Volume[0].interval.push_back(MaxPoint.x);
+                }
 
-                    std::vector<double> interval;
-                    int fignum = 0;
-                    //Обход фигур по порядку приоритета
-                    for (Figure CurFig : Figures) {
-                        fignum++;
-                        int fnp = (int)CurFig.getTopPoints().size(); //fnp - Figure number of points
-                        for (int fn = 0; fn < fnp; fn++) { //FN - FirstNumber //SN - SecondNumber
-                            int sn;
-                            fn + 1 < fnp ? sn = fn + 1 : sn = 0;
-                            //Проверяем пересекает ли плоскость граней фигуры наш "столб"
-                            if (!PlaneIntersectLine(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn],StartLine,EndLine, &InterPoint)) {
-                                //Проверяем, находится ли точка в пределах фигуры
-                                if (InterPoint.x >= CurFig.getMinMax().first.x && InterPoint.x <= CurFig.getMinMax().second.x)
+
+                //Считаем получившуюся суммарную пористость и площадь КЭ
+                double porosity = 0, calcVM = 0;
+                for (VolumeSt VolumePart : Volume) {
+                    porosity += VolumePart.Volume * VolumePart.Phi;
+                    calcVM += VolumePart.Volume;
+                }
+
+                PorosityFile << "Average Phi = " << porosity / calcVM << std::endl;
+                int i = 0;
+                for (VolumeSt VolumePart : Volume) {
+                    PorosityFile << "Figure " << i << " volume = " << VolumePart.Volume << std::endl;
+                    i++;
+                }
+
+                StatsFile << "CalculatedVolume = " << calcVM << std::endl;
+                StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
+                StatsFile << "TimePassed = " << TimePassed.getTime() - tick << std::endl;
+                tick = TimePassed.getTime();
+            }
+
+            if (!firstmeth) {
+                StatsFile << "-------------------------2 meth-------------------------------" << std::endl;
+
+                //Разбиваем на "столбы" и работаем с ними
+                for (int i = 0; i < BreakKoeff; i++) {
+                    for (int j = 0; j < BreakKoeff; j++) {
+
+                        //Формируем рабочую прямую параллельную оси x
+                        Point StartLine(MinPoint.x, MinPoint.y + Step.y * (i + 0.5), MinPoint.z + Step.z * (j + 0.5));
+                        Point EndLine(MinPoint.x + 1, MinPoint.y + Step.y * (i + 0.5), MinPoint.z + Step.z * (j + 0.5));
+                        //Точка пересечения
+                        Point InterPoint;
+                        for (int tfn = 0; tfn < halfElementsize; tfn++) { //TFN - TopFirstNumber //TSN - TopSecondNumber
+                            int tsn;
+                            tfn + 1 < halfElementsize ? tsn = tfn + 1 : tsn = 0;
+                            //Проверяем пересекает ли плоскость грани наш "столб"
+                            if (!PlaneIntersectLine(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn + halfElementsize], StartLine, EndLine, &InterPoint)) {
+                                //Проверяем, находится ли точка в пределах элемента
+                                if (InterPoint.x >= MinPoint.x && InterPoint.x <= MaxPoint.x)
                                     //Проверяем, находится ли точка в грани
                                     //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
-                                    if (PointInsideTriangle(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], InterPoint) || (PointInsideTriangle(CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], CurFig.getBottomPoints()[sn], InterPoint))) {
-                                        //Если точка пересечения попадает в главные интервалы добавляем ее в интервал текущей фигуры
-                                        for (int num = 0; num < Volume[0].interval.size(); num += 2) {
-                                            if (InterPoint.x >= Volume[0].interval[num] && InterPoint.x <= Volume[0].interval[num + 1])
-                                                Volume[fignum].interval.push_back(InterPoint.x);
-                                        }
+                                    if (PointInsideTriangle(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn + halfElementsize], InterPoint) || (PointInsideTriangle(ElementPolygon[tsn], ElementPolygon[tfn + halfElementsize], ElementPolygon[tsn + halfElementsize], InterPoint))) {
+                                        Volume[0].interval.push_back(InterPoint.x);
                                     }
                             }
 
                         }
-                        std::sort(Volume[fignum].interval.begin(), Volume[fignum].interval.end());
-                        if (Volume[fignum].interval.size() % 2 != 0) Volume[fignum].interval.push_back(MaxPoint.x);
-                    }
+                        //Получены главные интервалы внутри элемента, в которых будет считаться обьем
+                        std::sort(Volume[0].interval.begin(), Volume[0].interval.end());
+                        //Проверяем количество интервалов на четность, если нечетное, добавляем максимальную границу
+                        if (Volume[0].interval.size() % 2 != 0) Volume[0].interval.push_back(MaxPoint.x);
 
-                    //Перенести выше
-                    //Добавляем суммарный обьем столба в соответствующем векторе Volume
-                    //По каждой фигуре
-                    for (int i = 1; i < Volume.size(); i++) {
-                        //По интервалам фигуры
-                        for (int j = 0; j < Volume[i].interval.size(); j += 2) {
-                            //По главному интервалу
-                            for (int mn = 0; mn < Volume[0].interval.size(); mn += 2) {
-                            bool leftinter = false;
-                            bool rightinter = false;
-                                //Левый интервал внутри
-                                if ((Volume[0].interval[mn] < Volume[i].interval[j]) && (Volume[0].interval[mn + 1] > Volume[i].interval[j]))
-                                    leftinter = true;
-                                //Правый интервал внутри
-                                if ((Volume[0].interval[mn] < Volume[i].interval[j + 1]) && (Volume[0].interval[mn + 1] > Volume[i].interval[j + 1]))
-                                    rightinter = true;
+                        std::vector<double> interval;
+                        int fignum = 0;
+                        //Обход фигур по порядку приоритета
+                        for (Figure CurFig : Figures) {
+                            fignum++;
+                            //Если точка внутри, добавляем первый начальный интервал
+                            if (CurFig.PointInside({ StartLine.x + (Step.x * 0.001), StartLine.y, StartLine.z }))
+                                Volume[fignum].interval.push_back(MinPoint.x);
+                            int fnp = (int)CurFig.getTopPoints().size(); //fnp - Figure number of points
+                            for (int fn = 0; fn < fnp; fn++) { //FN - FirstNumber //SN - SecondNumber
+                                int sn;
+                                fn + 1 < fnp ? sn = fn + 1 : sn = 0;
+                                //Проверяем пересекает ли плоскость граней фигуры наш "столб"
+                                if (!PlaneIntersectLine(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], StartLine, EndLine, &InterPoint)) {
+                                    //Проверяем, находится ли точка в пределах фигуры
+                                    if (InterPoint.x > CurFig.getMinMax().first.x && InterPoint.x <= CurFig.getMinMax().second.x)
+                                        //Проверяем, находится ли точка в грани
+                                        //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
+                                        if (PointInsideTriangle(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], InterPoint) || (PointInsideTriangle(CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], CurFig.getBottomPoints()[sn], InterPoint))) {
+                                            //Если точка пересечения попадает в главные интервалы добавляем ее в интервал текущей фигуры
+                                            for (int num = 0; num < Volume[0].interval.size(); num += 2) {
+                                                if (InterPoint.x >= Volume[0].interval[num] && InterPoint.x <= Volume[0].interval[num + 1])
+                                                    Volume[fignum].interval.push_back(InterPoint.x);
+                                            }
+                                        }
+                                }
+                            }
+                            std::sort(Volume[fignum].interval.begin(), Volume[fignum].interval.end());
+                            if (Volume[fignum].interval.size() % 2 != 0) Volume[fignum].interval.push_back(MaxPoint.x);
+                        }
 
-                                //Интервал фигуры внутри
-                                if (leftinter && rightinter) {
-                                    if ((Volume[0].interval[mn] != Volume[i].interval[j]) && (Volume[0].interval[mn + 1] != Volume[i].interval[j + 1]))
-                                        Volume[0].interval.insert(Volume[0].interval.begin() + (mn + 1), { Volume[i].interval[j], Volume[i].interval[j + 1] });
-                                    //Полностью равно интервалу
-                                    else {
-                                        //Два раза, потому что элемент смещается
-                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
-                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                        //Перенести выше
+                        //Добавляем суммарный обьем столба в соответствующем векторе Volume
+                        //По каждой фигуре
+                        for (int i = 1; i < Volume.size(); i++) {
+                            //По интервалам фигуры
+                            for (int j = 0; j < Volume[i].interval.size(); j += 2) {
+                                //По главному интервалу
+                                for (int mn = 0; mn < Volume[0].interval.size(); mn += 2) {
+                                    bool leftinter = false;
+                                    bool rightinter = false;
+                                    //Левый интервал внутри
+                                    if ((Volume[0].interval[mn] < Volume[i].interval[j]) && (Volume[0].interval[mn + 1] > Volume[i].interval[j]))
+                                        leftinter = true;
+                                    //Правый интервал внутри
+                                    if ((Volume[0].interval[mn] < Volume[i].interval[j + 1]) && (Volume[0].interval[mn + 1] > Volume[i].interval[j + 1]))
+                                        rightinter = true;
+
+                                    //Интервал фигуры внутри
+                                    if (leftinter && rightinter) {
+                                        if ((Volume[0].interval[mn] != Volume[i].interval[j]) && (Volume[0].interval[mn + 1] != Volume[i].interval[j + 1]))
+                                            Volume[0].interval.insert(Volume[0].interval.begin() + (mn + 1), { Volume[i].interval[j], Volume[i].interval[j + 1] });
+                                        //Полностью равно интервалу
+                                        else {
+                                            //Два раза, потому что элемент смещается
+                                            Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                            Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                        }
+                                        Volume[i].Volume += StepSquare * (Volume[i].interval[j + 1] - Volume[i].interval[j]);
+                                        break;
                                     }
-                                    Volume[i].Volume += StepSquare * (Volume[i].interval[j + 1] - Volume[i].interval[j]);
-                                    break;
-                                }
 
-                                //Интервал наложен на правую границу
-                                else if(leftinter && !rightinter){
-                                    Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[i].interval[j]);
-                                    //Меняем правую границу
-                                    Volume[0].interval[mn+1] = Volume[i].interval[j];
-                                    j -= 2;
-                                    break;
-                                }
-
-                                //Интервал наложен на левую границу
-                                else if (!leftinter && rightinter) {
-                                    Volume[i].Volume += StepSquare * (Volume[i].interval[j+1] - Volume[0].interval[mn]);
-                                    //Меняем левую границу
-                                    Volume[0].interval[mn] = Volume[i].interval[j+1];
-                                    j -= 2;
-                                    break;
-                                }
-
-                                //Интервал наложен целиком, либо находится вне
-                                else {
-                                    //Наложен целиком
-                                    if ((Volume[0].interval[mn] >= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] <= Volume[i].interval[j + 1])) {
-                                        Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[0].interval[mn]);
-                                        //Два раза, потому что элемент смещается
-                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
-                                        Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                    //Интервал наложен на правую границу
+                                    else if (leftinter && !rightinter) {
+                                        Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[i].interval[j]);
+                                        //Меняем правую границу
+                                        Volume[0].interval[mn + 1] = Volume[i].interval[j];
                                         j -= 2;
                                         break;
                                     }
+
+                                    //Интервал наложен на левую границу
+                                    else if (!leftinter && rightinter) {
+                                        Volume[i].Volume += StepSquare * (Volume[i].interval[j + 1] - Volume[0].interval[mn]);
+                                        //Меняем левую границу
+                                        Volume[0].interval[mn] = Volume[i].interval[j + 1];
+                                        j -= 2;
+                                        break;
+                                    }
+
+                                    //Интервал наложен целиком, либо находится вне
+                                    else {
+                                        //Наложен целиком
+                                        if ((Volume[0].interval[mn] >= Volume[i].interval[j]) && (Volume[0].interval[mn + 1] <= Volume[i].interval[j + 1])) {
+                                            Volume[i].Volume += StepSquare * (Volume[0].interval[mn + 1] - Volume[0].interval[mn]);
+                                            //Два раза, потому что элемент смещается
+                                            Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                            Volume[0].interval.erase(Volume[0].interval.begin() + (mn));
+                                            j -= 2;
+                                            break;
+                                        }
+                                    }
                                 }
+                            }
                         }
+                        //Считаем оставшийся фоновый обьем
+                        for (int mn = 0; mn < Volume[0].interval.size(); mn += 2)
+                            Volume[0].Volume += (Volume[0].interval[mn + 1] - Volume[0].interval[mn]) * StepSquare;
+                        for (int i = 0; i < Volume.size(); i++)
+                            Volume[i].interval.clear();
                     }
-                    //Считаем оставшийся фоновый обьем
-                    for (int mn = 0; mn < Volume[0].interval.size(); mn += 2)
-                        Volume[0].Volume += (Volume[0].interval[mn + 1] - Volume[0].interval[mn]) * StepSquare;
-                    for (int i = 0; i < Volume.size(); i++)
-                        Volume[i].interval.clear();
-                    
                 }
+
+                //Считаем получившуюся суммарную пористость и площадь КЭ
+                double porosity = 0, calcVM = 0;
+                for (VolumeSt VolumePart : Volume) {
+                    porosity += VolumePart.Volume * VolumePart.Phi;
+                    calcVM += VolumePart.Volume;
+                }
+
+                PorosityFile << "Average Phi meth = " << porosity / calcVM << std::endl;
+                int i = 0;
+                for (VolumeSt VolumePart : Volume) {
+                    PorosityFile << "Figure " << i << " volume = " << VolumePart.Volume << std::endl;
+                    i++;
+                }
+
+                StatsFile << "CalculatedVolume = " << calcVM << std::endl;
+                StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
+                StatsFile << "TimePassed  = " << TimePassed.getTime() - tick << std::endl;
+                tick = TimePassed.getTime();
             }
-
-            //Считаем получившуюся суммарную пористость и площадь КЭ
-            double porosity = 0, calcVM = 0;
-            for (VolumeSt VolumePart : Volume) {
-                porosity += VolumePart.Volume * VolumePart.Phi;
-                calcVM += VolumePart.Volume;
-
-            }
-
-            PorosityFile << "Average Phi = " << porosity << endl;
-            int i = 0;
-            for (VolumeSt VolumePart : Volume) {
-                StatsFile << "Square figure " << i << "=" << VolumePart.Volume << endl;
-                i++;
-            }
-
-            StatsFile << "CalculatedVolume = " << calcVM << endl;
-            //StatsFile << "Square Difference = " << 100 - (calcVM / (PolygonSquare(ElementPolygon) / 100)) << endl;
-            StatsFile << "SplitKoef = " << BreakKoeff << endl;
-            StatsFile << "TimePassed = " << TimePassed.getTime() << endl;
-            StatsFile << "--------------------------------------------------------" << endl;
-
             ElementPolygon.clear();
         }
+        StatsFile << "SumTime = " << TimePassed.getTime();
+        LogFile << "Success";
     }
     catch (int ErrorCode) {
         switch (ErrorCode) {
@@ -376,6 +429,7 @@ int main() {
         LogFile << ErrorCode << " Exception thrown" << std::endl;
         return ErrorCode;
     }
+  
     return 0;
 }
 
