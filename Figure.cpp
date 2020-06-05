@@ -86,9 +86,16 @@ bool Figure::PointInside(const Point point) {
         i + 1 < TopPoints.size() ? j = i + 1 : j = 0;
 
         //Проверка на нахождение проверяемой точки в окрестности грани
-        if (!PlaneIntersectLine(TopPoints[i], TopPoints[j], BottomPoints[i], point, { point.x + 1, point.y, point.z }, &InterPoint) && (InterPoint.x >= point.x))
-                if ((PointInsideTriangle(TopPoints[i], TopPoints[j], BottomPoints[i], InterPoint)) || (PointInsideTriangle(TopPoints[j], BottomPoints[i], BottomPoints[j], InterPoint)))
-                    inside = !inside;
+        if (!PlaneIntersectLine(TopPoints[i], TopPoints[j], BottomPoints[i], point, { point.x + 1, point.y, point.z }, &InterPoint) && (InterPoint.x >= point.x) && (InterPoint.y >= point.y) && (InterPoint.z >= point.z))
+            if ((InterPoint.x + 0.00000001 > TopPoints[j].x) && (InterPoint.x - 0.00000001 < TopPoints[j].x) && (InterPoint.y + 0.00000001 > TopPoints[j].y) && (InterPoint.y - 0.00000001 < TopPoints[j].y)) {
+                inside = !inside;
+                i++;
+                i + 1 < TopPoints.size() ? j = i + 1 : j = 0;
+            }
+            else if ((PointInsideTriangle(TopPoints[i], TopPoints[j], BottomPoints[i], InterPoint)) || (PointInsideTriangle(TopPoints[j], BottomPoints[i], BottomPoints[j], InterPoint))) {
+                inside = !inside;
+            }
+                   
     }
 
 

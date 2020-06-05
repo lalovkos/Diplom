@@ -6,7 +6,7 @@
 #include "Utility.h"
 #include <time.h>
 
-#define BreakKoeff 100
+#define BreakKoeff 10
 #define GridInputFileName "Grid.txt"
 #define FiguresInputFileName "Points.txt"
 #define LogFileName "Log.txt"
@@ -206,7 +206,9 @@ int main() {
             double StepSquare = Step.y * Step.z;
             int halfElementsize = (int)(ElementPolygon.size() / 2);
 
-            PorosityFile << ".............Elem " << pos << "..............." << endl;
+            PorosityFile << "E" << pos << " ";
+            if (pos == 78)
+                cout << " ";
             if (firstmeth) {
                 StatsFile << "-----------------------------1 meth---------------------------" << std::endl;
                 for (int i = 0; i < BreakKoeff; i++) {
@@ -233,11 +235,11 @@ int main() {
                     porosity += VolumePart.Volume * VolumePart.Phi;
                     calcVM += VolumePart.Volume;
                 }
-
-                PorosityFile << "Average Phi = " << porosity / calcVM << std::endl;
+                if (pos % 9 == 0) PorosityFile << "P=" << porosity / calcVM << endl;
+                else PorosityFile << "P=" << porosity / calcVM << "; ";
                 int i = 0;
                 for (VolumeSt VolumePart : Volume) {
-                    PorosityFile << "Figure " << i << " volume = " << VolumePart.Volume << std::endl;
+                    //PorosityFile << "F" << i << "V=" << VolumePart.Volume << std::endl;
                     i++;
                 }
 
@@ -249,7 +251,6 @@ int main() {
 
             if (!firstmeth) {
                 StatsFile << "-------------------------2 meth-------------------------------" << std::endl;
-
                 //Разбиваем на "столбы" и работаем с ними
                 for (int i = 0; i < BreakKoeff; i++) {
                     for (int j = 0; j < BreakKoeff; j++) {
@@ -389,13 +390,8 @@ int main() {
                     calcVM += VolumePart.Volume;
                 }
 
-                PorosityFile << "Average Phi meth = " << porosity / calcVM << std::endl;
-                int i = 0;
-                for (VolumeSt VolumePart : Volume) {
-                    PorosityFile << "Figure " << i << " volume = " << VolumePart.Volume << std::endl;
-                    i++;
-                }
-
+                if (pos % 9 == 0) PorosityFile << "P=" << porosity / calcVM << endl;
+                else PorosityFile << "P=" << porosity / calcVM << "; ";
                 StatsFile << "CalculatedVolume = " << calcVM << std::endl;
                 StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
                 StatsFile << "TimePassed  = " << TimePassed.getTime() - tick << std::endl;
