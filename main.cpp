@@ -3,24 +3,55 @@
 #include <clocale>  
 #include "Timer.h"
 #include "Point.h"
+#include <algorithm>
 #include "Utility.h"
 #include <time.h>
 
-#define BreakKoeff 100
-#define GridInputFileName "Grid.txt"
+#define BreakKoeff 10
+#define CountFileName "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\mesh\\inftry.dat"
+#define ElementFileName "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\mesh\\nver.dat"
+#define NodesFileName "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\mesh\\xyz.dat"
+#define MaterialsFileName "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\properties\\materialsN.txt"
+#define Element_MatNumFile "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\mesh\\nvkat.dat"
+#define FiguresContoursFile "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\mesh\\ContoursMaterialGeometry"
+#define NewMaterialsFileName "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\properties\\materialsN_new.txt"
+#define NewElement_MatNumFile "C:\\Users\\METAL\\Desktop\\Diplom\\Model\\mesh\\nvkat_new.dat"
 #define FiguresInputFileName "Points.txt"
 #define LogFileName "Log.txt"
 #define PorosityFileName "Porosity.txt"
 #define ResultsFileName "Stats.txt"
+#define Depth -5 
+
+
+#define uint unsigned int
+
 
 using namespace std;
 
 std::ofstream LogFile; //Глобальный файл логов
 
-struct Grid {
-    std::vector<Point> Setka;
-    std::vector<std::vector<int>> Elements;
+struct Material {
+    int type;
+    double K;
     double Phi;
+    double something1;
+    double something2;
+};
+
+struct Element {
+    std::vector<int> points;
+    int nmat;
+    Element(int* pointmas) {
+        for (uint i = 0; i < 8; i++) {
+            points.push_back(pointmas[i]);
+        }
+    }
+};
+
+struct Grid {
+    std::vector<Point> Nodes;
+    std::vector<Element> Elements;
+    std::vector<Material> Mats;
 };
 
 struct VolumeSt {
@@ -29,175 +60,275 @@ struct VolumeSt {
     double Phi;
 };
 
-//Ввод сетки
-Grid InputGrid(const char* filename) {
-    Grid tmpGrid;
+//Ввод сетки - countfilename = "\\inftry.dat", 
+//nodefilename = "\\xyz.dat", 
+//elemfilename = "\\nver.dat", 
+//materialsfilename = "\\materialsN"
+//elem_matfilename = "\\nvkat.dat" 
+Grid* InputGrid(const char* countfilename, const char* nodefilename, const char* elemfilename, const char* materialsfilename, const char *elem_matfilename) {
+
+    Grid *tmpGrid = new Grid;
     Point tmppoint;
-    std::vector<int> tmpvector;
-    ifstream gridfile(filename);
-    if (gridfile.is_open()) {
-        int  nodecount;
-        if (!(gridfile >> nodecount)) { 
-            LogFile << "Mistake in " << filename << " - Nodecount is not a number" << std::endl; 
-            throw 1;  
-        }
-        for (int i = 0; i < nodecount; i++) {
-            if (!(gridfile >> tmppoint.x) || !(gridfile >> tmppoint.y) || !(gridfile >> tmppoint.z)) { 
-                LogFile << "Mistake in " << filename << " - Node points is not a number" << std::endl;
-                throw 1; 
-            }
-            else tmpGrid.Setka.push_back(tmppoint);
-        }
-        int elementscount;
-        int pointsincurrent;
-        double node;
-        if (!(gridfile >> elementscount) || (elementscount <= 0)) {
-            LogFile << "Mistake in " << filename << " - Elements count is not a number or has unexpected value" << std::endl;
-            LogFile.close();
-            throw 1;
-        }
-        for (int i = 0; i < elementscount; i++) {
-            if (!(gridfile >> pointsincurrent) || (pointsincurrent <= 0)) {
-                LogFile << "Mistake in " << filename << " - Currents elements count is not a number or has unexpected value" << std::endl;
-                LogFile.close();
-                throw 1;
-            }
-            for (int j = 0; j < pointsincurrent; j++) {
-                if (!(gridfile >> node)) {
-                    LogFile << "Mistake in " << filename << " - Elements point is not a number" << std::endl;
-                    LogFile.close();
-                    throw 1;
-                }
-                tmpvector.push_back(node);
-            }
-            tmpGrid.Elements.push_back(tmpvector);
-            tmpvector.clear();
-        }
-        if (!(gridfile >> tmpGrid.Phi) || (tmpGrid.Phi < 0) || (tmpGrid.Phi > 1)) {
-            LogFile << "Mistake in" << filename << " - Phi is not a number or has unexpected Value" << std::endl;
-            LogFile.close();
-            throw 1;
-        }
-    }
-    else {
-        LogFile << "Cannot open " << filename << std::endl;
+    Material mat;
+    std::vector<Point> tmppoints;
+
+    ifstream file;
+    //Считываем количество узлов и точек
+    file.open(countfilename, ios::in);
+    if (!file) {
+        LogFile << "Cannot open " << countfilename << std::endl;
         throw 1;
     }
-    gridfile.close();
+    file.ignore(1000, '\n');
+    file.ignore(1000, '=');
+    uint nodecount;
+    if (!(file >> nodecount)) {
+        LogFile << "Mistake in " << countfilename << " - Node count is not a number" << std::endl;
+        file.close();
+        throw 1;
+    }
+    file.ignore(1000, '=');
+    uint elemcount;
+    if (!(file >> elemcount)) {
+        LogFile << "Mistake in " << countfilename << " - Elements count is not a number" << std::endl;
+        file.close();
+        throw 1;
+    }
+    file.close();
+    file.clear();
+
+    tmpGrid->Nodes.reserve(nodecount);
+    tmpGrid->Elements.reserve(elemcount);
+    
+    //Считываем точки узлов
+    file.open(nodefilename, ios::binary | ios::in);
+    if (!file) {
+        LogFile << "Cannot open " << nodefilename << std::endl;
+        throw 1;
+    }
+    double* tmpPoints = new double[3 * nodecount];
+    if (!file.read((char*)tmpPoints, sizeof(double) * 3 * nodecount)) {
+        LogFile << "Mistake in " << nodefilename << " - Node points is not a number" << std::endl;
+        file.close();
+        throw 1;
+    }
+    for (int i = 0; i < nodecount; i++)
+        tmpGrid->Nodes.push_back(&tmpPoints[i * 3]);
+    delete[] tmpPoints;
+    file.close();
+    file.clear();
+
+    //Считываем номера узлов для элементов
+    file.open(elemfilename, ios::binary | ios::in);
+    if (!file) {
+        LogFile << "Cannot open " << elemfilename << std::endl;
+        throw 1;
+    }
+    //14 это 8 номеров по 4, и 6 байт игнорируем?
+    int* tmpElem = new int[14 * elemcount];
+    if (!file.read((char*)tmpElem, sizeof(int) * 14 * elemcount)) {
+        LogFile << "Mistake in " << elemfilename << " - Element point is not a number" << std::endl;
+        file.close();
+        throw 1;
+    }
+    tmpGrid->Elements.push_back(Element(&tmpElem[0]));
+    for (int i = 1; i < elemcount; i++)
+        tmpGrid->Elements.push_back(Element(&tmpElem[i * 14]));
+    delete[]tmpElem;
+    file.close();
+    file.clear();
+    
+    for (uint i = 0; i < elemcount; i++)
+        for (uint j = 0; j < 8; j++) 
+            tmpGrid->Elements[i].points[j]--;
+
+    //Считываем материалы по номерам
+    file.open(materialsfilename,ios::in);
+    if (!file) {
+        LogFile << "Cannot open " << materialsfilename << std::endl;
+        throw 1;
+    }
+    uint matcount;
+    if (!(file >> matcount)) {
+        LogFile << "Mistake in " << materialsfilename << " - material count not a number" << std::endl;
+        file.close();
+        throw 1;
+    }
+    for (uint i = 0; i < matcount; i++) {
+        if (!(file >> mat.type >> mat.K  >> mat.Phi >> mat.something1 >> mat.something2)) {
+            LogFile << "Mistake in " << materialsfilename << " - Material property is not a number" << std::endl;
+            file.close();
+            throw 1;
+        }
+        tmpGrid->Mats.push_back(mat);
+    }
+    file.close();
+    file.clear();
+
+    //Считываем номера материалов для каждого из элементов
+    file.open(elem_matfilename, ios::binary | ios::in);
+    if (!file) {
+        LogFile << "Cannot open " << elem_matfilename << std::endl;
+        throw 1;
+    }
+    int* tmpNumbers = new int[elemcount];
+    if (!file.read((char*)tmpNumbers, sizeof(int) * elemcount)) {
+        LogFile << "Mistake in " << elem_matfilename << " - Material number is not a number" << std::endl;
+        file.close();
+        throw 1;
+    }
+    for (int i = 0; i < elemcount; i++)
+        tmpGrid->Elements[i].nmat = --tmpNumbers[i];
+    delete[] tmpNumbers;
+    file.close();
+    file.clear();
+
     return tmpGrid;
 }
 
 //Ввод фигур
-std::vector<Figure> InputFigures(const char* filename) {
-    ifstream figuresfile(filename);
-   
+std::vector<Figure> InputFigures(const char* figuresfilename) {
+    ifstream figuresfile(figuresfilename);
+
     std::vector<Figure> tmpvector;
     std::vector<Point> topfigurepoints, bottomfigurepoints;
 
     if (figuresfile.is_open()) {
-        while (!figuresfile.eof()) {
+
+        int fignum;
+        //Временная штука, убрать
+        figuresfile >> fignum;
+        figuresfile >> fignum;
+        figuresfile >> fignum;
+        figuresfile >> fignum;
+        figuresfile >> fignum;
+        //Временная штука, убрать
+        
+        //Считываем количество фигур
+        if (!(figuresfile >> fignum)) {
+            LogFile << "Mistake in " << figuresfilename << " - figure number is not a number" << std::endl;
+            figuresfile.close();
+            throw 2;
+        }
+        //Для каждой фигуры
+        for (uint fn = 0; fn < fignum; fn++) {
             int numberofpoints;
             double Phi;
             int Order;
             if ((figuresfile >> numberofpoints))
+                //Число точек
                 if (numberofpoints > 0) {
-                for (int i = 0; i < numberofpoints; i++) {
-                    Point tmppoint;
-                    if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y) || !(figuresfile >> tmppoint.z)) {
-                        LogFile << "Mistake in " << filename << " - figure point is not a number" << std::endl;
-                        throw 2;
+                    for (int i = 0; i < numberofpoints; i++) {
+                        Point tmppoint;
+                        //Считываем координаты
+                        if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y)  /*!(figuresfile >> tmppoint.z)*/) {
+                            LogFile << "Mistake in " << figuresfilename << " - figure point is not a number" << std::endl;
+                            figuresfile.close();
+                            throw 2;
+                        }
+                        tmppoint.z = 0;
+                        topfigurepoints.push_back(tmppoint);
+                        //Тут бы по хорошему считывать глубину слоя или типо того
+                        tmppoint.z = Depth;
+                        bottomfigurepoints.push_back(tmppoint);
                     }
-                    topfigurepoints.push_back(tmppoint);
-                }
-                for (int i = 0; i < numberofpoints; i++) {
-                    Point tmppoint;
-                    if (!(figuresfile >> tmppoint.x) || !(figuresfile >> tmppoint.y) || !(figuresfile >> tmppoint.z)) {
-                        LogFile << "Mistake in " << filename << " - Figures point is not a number" << std::endl;
-                        throw 2;
-                    }
-                    bottomfigurepoints.push_back(tmppoint);
-                }
-                if (!(figuresfile >> Phi)) LogFile << "Mistake in " << filename << " - Phi is not a number" << std::endl;
-                if (!(figuresfile >> Order)) LogFile << "Mistake in " << filename << " - Order is not a number" << std::endl;
 
-                tmpvector.push_back(Figure(topfigurepoints, bottomfigurepoints, Phi, Order));
-                topfigurepoints.clear();
-                bottomfigurepoints.clear();
-            }
-            else {
-                LogFile << "Mistake in " << filename << " - Figures number is not a number or has unexpected value" << std::endl;
-                throw 2;
-            }
-            
+                    //if (!(figuresfile >> Phi)) LogFile << "Mistake in " << figuresfilename << " - Phi is not a number" << std::endl;
+                    Phi = 0.6;
+                    Order = fignum - fn;
+                    //if (!(figuresfile >> Order)) LogFile << "Mistake in " << figuresfilename << " - Order is not a number" << std::endl;
+
+                    tmpvector.push_back(Figure(topfigurepoints, bottomfigurepoints, Phi, Order));
+                    topfigurepoints.clear();
+                    bottomfigurepoints.clear();
+                }
+                else {
+                    LogFile << "Mistake in " << figuresfilename << " - Figures number is not a number or has unexpected value" << std::endl;
+                    figuresfile.close();
+                    throw 2;
+                }
         }
     }
     else {
-        LogFile << "Cannot open" << filename << std::endl;
+        LogFile << "Cannot open" << figuresfilename << std::endl;
 
     }
     figuresfile.close();
     return tmpvector;
 }
 
-//Не работает
-bool PointInsideVector(std::vector<Point> vect, Point point) {
-    for (int i = 0; i < (int)vect.size() - 1; i++)
-        if (PointInsideTriangle(vect[i], vect[i + 1], vect[(int)vect.size() - 1], point)) return true;
-    return false;
-}
-
-
 //TODO: Добавить и привыкнуть к vector.reserve
+//TODO: Поменять вывод материалов
 //TODO: Добавить закрытие всех файлов
 //TODO: Добавить НОРМАЛЬНОЕ MinMax начальные значения
+//TODO: Реализовать HeshMap для вывода материалов
 //TODO: Добавить LogFile везде
 //TODO: Испратить !PlaneInter
+//TODO: Убрать бесполезный цикл -- в вводе и переставить на вывод
+//TODO: Исправить поведение по с слоями
+
 //Основная программа
 int main() {
     try{ 
-        bool firstmeth = false;
+        bool firstmeth = true;
         double tick;
         LogFile.open(LogFileName);
-        Timer TimePassed;
-        Grid GeneralGrid = InputGrid(GridInputFileName);
-        std::vector<Figure> Figures = InputFigures(FiguresInputFileName);
-        std::sort(Figures.begin(),Figures.end(),greater<Figure>()); //Сортировка по приоритету(по убыванию)
-
-        std::ofstream StatsFile;
         std::ofstream PorosityFile;
-        StatsFile.open(ResultsFileName);
         PorosityFile.open(PorosityFileName);
+        Timer TimePassed;
+        Grid *GeneralGrid = InputGrid(CountFileName, NodesFileName,ElementFileName, MaterialsFileName, Element_MatNumFile);
+        std::vector<Figure> Figures = InputFigures(FiguresContoursFile);
+        std::sort(Figures.begin(),Figures.end(),greater<Figure>()); //Сортировка по приоритету(по убыванию)
+        
+        //Открываем для записи нужные файлы
+        ofstream newelem_numfile;
+        newelem_numfile.open(NewElement_MatNumFile, ios::binary | ios::out);
+        ofstream newmaterialsfile;
+        newmaterialsfile.open(NewMaterialsFileName, ios::out);
+        newmaterialsfile << GeneralGrid->Elements.size() << " " << std::endl;
 
+        LogFile << "InputTime " << TimePassed.getTime() << std::endl;
+
+        //Вектор обьемов по фигурам внутри КЭ
         std::vector<VolumeSt> Volume;
         
-        //Глобальный Phi будет в 0 элементе
-        Volume.reserve(Figures.size()+1);
-        Volume.push_back({{},0,GeneralGrid.Phi});
+        //Очищаем фоновую(которая была в КЭ )
+        Volume.reserve(Figures.size() + 1);
+        Volume.push_back({ {}, 0, 0});
 
-        //Количество разных площадей потенциально в каждом КЭ с их показателями Phi
+        //Количество разных площадей потенциально в каждом КЭ
         for (int i = 1; i < Figures.size()+1; i++)
-            Volume.push_back({ {}, 0, Figures[i-1].getPhi() });
+            Volume.push_back({ {}, 0 , 0});
         tick = TimePassed.getTime();
         int pos = 0;
+
         //Главный цикл по КЭ
-        for (std::vector<int> CurrentElement : GeneralGrid.Elements) {
+        for (Element CurrentElement : GeneralGrid->Elements) {
             std::vector<Point> ElementPolygon;
+            Material CurMat = GeneralGrid->Mats[CurrentElement.nmat];
             pos++;
             
             //Формируем полигон КЭ, а заодно считаем его опоясывающий куб
             Point MinPoint(100000000,100000000, 100000000), MaxPoint(-100000000, -100000000, -100000000); //Минимальная, максимальная точки элемента
-            for (int i : CurrentElement) {
-                ElementPolygon.push_back(GeneralGrid.Setka[i]);
-                if (GeneralGrid.Setka[i].x < MinPoint.x) MinPoint.x = GeneralGrid.Setka[i].x;
-                else if (GeneralGrid.Setka[i].x > MaxPoint.x) MaxPoint.x = GeneralGrid.Setka[i].x;
+            for (int i : CurrentElement.points) {
+                ElementPolygon.push_back(GeneralGrid->Nodes[i]);
+                if (GeneralGrid->Nodes[i].x < MinPoint.x) MinPoint.x = GeneralGrid->Nodes[i].x;
+                else if (GeneralGrid->Nodes[i].x > MaxPoint.x) MaxPoint.x = GeneralGrid->Nodes[i].x;
 
-                if (GeneralGrid.Setka[i].y < MinPoint.y) MinPoint.y = GeneralGrid.Setka[i].y;
-                else if (GeneralGrid.Setka[i].y > MaxPoint.y) MaxPoint.y = GeneralGrid.Setka[i].y;
+                if (GeneralGrid->Nodes[i].y < MinPoint.y) MinPoint.y = GeneralGrid->Nodes[i].y;
+                else if (GeneralGrid->Nodes[i].y > MaxPoint.y) MaxPoint.y = GeneralGrid->Nodes[i].y;
 
-                if (GeneralGrid.Setka[i].z < MinPoint.z) MinPoint.z = GeneralGrid.Setka[i].z;
-                else if (GeneralGrid.Setka[i].z > MaxPoint.z) MaxPoint.z = GeneralGrid.Setka[i].z;
+                if (GeneralGrid->Nodes[i].z < MinPoint.z) MinPoint.z = GeneralGrid->Nodes[i].z;
+                else if (GeneralGrid->Nodes[i].z > MaxPoint.z) MaxPoint.z = GeneralGrid->Nodes[i].z;
             }
-
+            
+            //Меняем 3 с 4 и 7 с 8 точки, для соблюдения обхода граней //Переделать в swap
+            std::swap(ElementPolygon[2], ElementPolygon[3]);
+            std::swap(ElementPolygon[6], ElementPolygon[7]);
+       
+            //Делаем для фоновой Phi значение равное значению до вычисления
+            Volume[0].Phi = GeneralGrid->Mats[CurrentElement.nmat].Phi;
+            
             //Обнуляем суммарные площади фигур на КЭ
             for (int i = 0; i < Figures.size() + 1; i++)
                 Volume[i].Volume = 0;
@@ -205,10 +336,9 @@ int main() {
             Point Step = { ((MaxPoint.x - MinPoint.x) / BreakKoeff),((MaxPoint.y - MinPoint.y) / BreakKoeff),((MaxPoint.z - MinPoint.z) / BreakKoeff) }; //Размер шага на КЭ
             double StepSquare = Step.y * Step.z;
             int halfElementsize = (int)(ElementPolygon.size() / 2);
-
-            PorosityFile << ".............Elem " << pos << "..............." << endl;
+            
+            //Выбор между первым и следующим методом 
             if (firstmeth) {
-                StatsFile << "-----------------------------1 meth---------------------------" << std::endl;
                 for (int i = 0; i < BreakKoeff; i++) {
                     for (int j = 0; j < BreakKoeff; j++) {
                         for (int k = 0; k < BreakKoeff; k++) {
@@ -225,31 +355,8 @@ int main() {
                         }
                     }
                 }
-
-
-                //Считаем получившуюся суммарную пористость и площадь КЭ
-                double porosity = 0, calcVM = 0;
-                for (VolumeSt VolumePart : Volume) {
-                    porosity += VolumePart.Volume * VolumePart.Phi;
-                    calcVM += VolumePart.Volume;
-                }
-
-                PorosityFile << "Average Phi = " << porosity / calcVM << std::endl;
-                int i = 0;
-                for (VolumeSt VolumePart : Volume) {
-                    PorosityFile << "Figure " << i << " volume = " << VolumePart.Volume << std::endl;
-                    i++;
-                }
-
-                StatsFile << "CalculatedVolume = " << calcVM << std::endl;
-                StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
-                StatsFile << "TimePassed = " << TimePassed.getTime() - tick << std::endl;
-                tick = TimePassed.getTime();
             }
-
-            if (!firstmeth) {
-                StatsFile << "-------------------------2 meth-------------------------------" << std::endl;
-
+            else {
                 //Разбиваем на "столбы" и работаем с ними
                 for (int i = 0; i < BreakKoeff; i++) {
                     for (int j = 0; j < BreakKoeff; j++) {
@@ -381,30 +488,36 @@ int main() {
                             Volume[i].interval.clear();
                     }
                 }
-
-                //Считаем получившуюся суммарную пористость и площадь КЭ
-                double porosity = 0, calcVM = 0;
-                for (VolumeSt VolumePart : Volume) {
-                    porosity += VolumePart.Volume * VolumePart.Phi;
-                    calcVM += VolumePart.Volume;
-                }
-
-                PorosityFile << "Average Phi meth = " << porosity / calcVM << std::endl;
-                int i = 0;
-                for (VolumeSt VolumePart : Volume) {
-                    PorosityFile << "Figure " << i << " volume = " << VolumePart.Volume << std::endl;
-                    i++;
-                }
-
-                StatsFile << "CalculatedVolume = " << calcVM << std::endl;
-                StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
-                StatsFile << "TimePassed  = " << TimePassed.getTime() - tick << std::endl;
-                tick = TimePassed.getTime();
             }
+
+            //Считаем получившуюся суммарную пористость и площадь КЭ
+            double porosity = 0, calcVM = 0;
+            for (VolumeSt VolumePart : Volume) {
+                porosity += VolumePart.Volume * CurMat.Phi;
+                calcVM += VolumePart.Volume;
+            }
+            porosity /= calcVM;
+
+            //Записываем в файлы результаты для отладки
+            PorosityFile << "El N = " << pos << " Phi = " << porosity << " V = " << calcVM << " XYZlb " << ElementPolygon[0].ToString() << std::endl;
+
+            //Записываем новый материал
+            Material tmpMat =  GeneralGrid->Mats[CurrentElement.nmat];
+            newmaterialsfile << tmpMat.type << " " << tmpMat.K << " " << tmpMat.Phi << " " << tmpMat.something1 << " " << tmpMat.something2 << " " << std::endl;;
+            
+            //Привязываем этот материал к КЭ
+            newelem_numfile.write((char*)&pos,sizeof(int));
+
+            //Очищение полигона и переход к новому элементу 
             ElementPolygon.clear();
+
         }
-        StatsFile << "SumTime = " << TimePassed.getTime();
+        LogFile << "SumTime = " << TimePassed.getTime() << std::endl;
         LogFile << "Success";
+        newelem_numfile.close();
+        newmaterialsfile.close();
+        PorosityFile.close();
+        LogFile.close();
     }
     catch (int ErrorCode) {
         switch (ErrorCode) {
@@ -423,111 +536,13 @@ int main() {
             break;
         }
 
-
         default: {std::cout << std::endl << "+++++++++++++++++++++++++++++" << "Unknown exeption = " << ErrorCode << std::endl; break; }
         }
         LogFile << ErrorCode << " Exception thrown" << std::endl;
+        LogFile.close();
         return ErrorCode;
     }
-  
+    
+    LogFile.close();
     return 0;
 }
-
-
-//Проверка на принадлежность точки нашему многоугольнику
-//bool PointInsidePolygon(const std::vector<std::pair<double, double>> polygon, std::pair<double, double> point) {
-//    bool result = false;
-//    int j = polygon.size() - 1;
-//    for (int i = 0; i < polygon.size(); i++) {
-//        if ((polygon[i].y < point.y && polygon[j].y >= point.y || polygon[j].y < point.y && polygon[i].y >= point.y) &&
-//            (polygon[i].x + (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) * (polygon[j].x - polygon[i].x) < point.x))
-//            result = !result;
-//        j = i;
-//    }
-//    return result;
-//}
-
-//if (node[i][j] && node[i + 1][j + 1] && node[i][j + 1] && node[i + 1][j]) //Если все узлы внутри - площадь вся находится в многоугольнике
-  //    Grid[i][j].Square = GridStep.x * GridStep.y;
-  //else if (!node[i][j] && !node[i + 1][j + 1] && !node[i][j + 1] && !node[i + 1][j]) //Если все узлы снаружи - КЭ пустой
-  //    Grid[i][j].Square = 0;
-  //else {
-      //Сюда попадаем если у нас часть узлов внутри, а часть снаружи
-      //Последовательно обходим все границы КЭ проверяя точки пересечения и записывая ее в вектор
-//            Grid[i][j].Square = CalculateBreakingSquare(points, 100, 100, GridStep, {min.x + i * GridStep.x, min.y + j * GridStep.y});
-//        /*}*/
-//        workingpolygon.clear();
-//    }
-//}
-
-//std::cout << "_________Points per element_________" << endl;
-//for (int i = 0; i < GRIDNUMBER_X+1; i++) {
-//    for (int j = 0; j < GRIDNUMBER_Y+1; j++) {
-//        std::cout << Grid[i][j].PointsNumbers.size() << " ";
-//    }
-//    std::cout << endl;
-//}
-
-//std::cout << "_________Inner Outer Nodes_________" << endl;
-//for (int i = 0; i < GRIDNUMBER_X + 1; i++) {
-//    for (int j = 0; j < GRIDNUMBER_Y + 1; j++) {
-//        std::cout << node[i][j] << "-";
-//    }
-//    std::cout << endl;
-//}
-
-//double GeneralSquare = 0;
-
-//std::cout << "_________Square_________" << endl;
-//for (int i = 0; i < GRIDNUMBER_X + 1; i++) {
-//    for (int j = 0; j < GRIDNUMBER_Y + 1; j++) {
-//        std::cout << std::setw(9) << Grid[i][j].Square;
-//        GeneralSquare += Grid[i][j].Square;
-//    }
-//    std::cout << endl;
-//}
-
-//std::cout << "Calculated Square = " << GeneralSquare << "<->";
-//GeneralSquare = PolygonSquare(points);
-//std::cout << "Real Square = " << GeneralSquare << endl;
-
-//std::cout << "_________Average Phi_________" << endl;
-//double porosity;
-//for (int i = 0; i < GRIDNUMBER_X + 1; i++) {
-//    for (int j = 0; j < GRIDNUMBER_Y + 1; j++) {
-//        porosity = (Grid[i][j].Square * 0.2 + ((GridStep.x * GridStep.y - Grid[i][j].Square) * 0.1)) / GridStep.x * GridStep.y;
-//        std::cout << std::setw(9) << porosity;
-//    }
-//    std::cout << endl;
-//}
-//std::cout << "Phi in = " << 0.2 << "<->";
-//std::cout << "Phi out = " << 0.1;
-//
-
-////Вычисление шага и инициализация сетки
-//std::pair<double, double> GridStep;
-//GridStep.x = (max.x - min.x) / GRIDNUMBER_X;
-//GridStep.y = (max.y - min.y) / GRIDNUMBER_Y;
-
-/* FinalElement Grid[GRIDNUMBER_X+1][GRIDNUMBER_Y+1];*/
-
- ////Обнуляем значения площади на КЭ
- //for (int i = 0; i < GRIDNUMBER_X; i++)
- //    for (int j = 0; j < GRIDNUMBER_Y; j++)
- //        Grid[i][j].Square= 0;
-
- ////Размечаем узлы на принадлежность многоугольнику
- //for (int i = 0; i < GRIDNUMBER_X; i++)
- //    for (int j = 0; j < GRIDNUMBER_Y; j++)
- //        node[i][j] = PointInsidePolygon(points, min.x + i*GridStep.x, min.y + j * GridStep.y);
- //
-
- ////Разбрасываем точки в их КЭ
- //int count = 0;
- //for (std::pair<double, double> CurPoint : points) { 
- //    int i = (int)floor((CurPoint.x - min.x) / GridStep.x);
- //    int j = (int)floor((CurPoint.y - min.y) / GridStep.y);
- //    Grid[i][j].PointsNumbers.push_back(count);
- //    count++;
- //}
-

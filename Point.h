@@ -14,6 +14,12 @@ public:
         z = Z;
     }
 
+    Point(double* points) {
+        x = points[0];
+        y = points[1];
+        z = points[2];
+    }
+
     Point() {
         x = 0;
         y = 0;
