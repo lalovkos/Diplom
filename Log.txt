@@ -1,1 +1,3 @@
-InputTime 0.13514
+InputTime 0.127248
+SumTime = 69.7139
+Success

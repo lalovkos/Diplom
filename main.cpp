@@ -270,7 +270,7 @@ std::vector<Figure> InputFigures(const char* figuresfilename) {
 //Основная программа
 int main() {
     try{ 
-        bool firstmeth = true;
+        bool firstmeth = false;
         double tick;
         LogFile.open(LogFileName);
         std::ofstream PorosityFile;
