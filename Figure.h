@@ -1,7 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
-#include <functional>
+#include <algorithm>
 #include <fstream>
 #include "Point.h"
 #include "Utility.h"

@@ -149,7 +149,7 @@
     <Text Include="Log.txt" />
     <Text Include="Points.txt" />
     <Text Include="Porosity.txt" />
-    <Text Include="Square.txt" />
+    <Text Include="Volume.txt" />
     <Text Include="Stats.txt" />
   </ItemGroup>
   <ItemGroup>

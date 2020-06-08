@@ -80,27 +80,19 @@ bool Figure::PointInside(const Point point) {
             return false;
 
     Point InterPoint;
-    //Проверка на прохождение луча боковыми гранями
+    //Алгоритм для прямой призмы
+    int j = TopPoints.size() - 1;
+    //Проверка на прохождение луча  
     for (int i = 0; i < TopPoints.size(); i++) {
-        int j;
-        i + 1 < TopPoints.size() ? j = i + 1 : j = 0;
-
-        //Проверка на нахождение проверяемой точки в окрестности грани
-        if (!PlaneIntersectLine(TopPoints[i], TopPoints[j], BottomPoints[i], point, { point.x + 1, point.y, point.z }, &InterPoint) && (InterPoint.x >= point.x) && (InterPoint.y >= point.y) && (InterPoint.z >= point.z))
-            if ((InterPoint.x + 0.00000001 > TopPoints[j].x) && (InterPoint.x - 0.00000001 < TopPoints[j].x) && (InterPoint.y + 0.00000001 > TopPoints[j].y) && (InterPoint.y - 0.00000001 < TopPoints[j].y)) {
-                inside = !inside;
-                i++;
-                i + 1 < TopPoints.size() ? j = i + 1 : j = 0;
-            }
-            else if ((PointInsideTriangle(TopPoints[i], TopPoints[j], BottomPoints[i], InterPoint)) || (PointInsideTriangle(TopPoints[j], BottomPoints[i], BottomPoints[j], InterPoint))) {
-                inside = !inside;
-            }
-                   
+        if ((TopPoints[i].y < point.y && TopPoints[j].y >= point.y || TopPoints[j].y < point.y && TopPoints[i].y >= point.y) &&
+            (TopPoints[i].x + (point.y - TopPoints[i].y) / (TopPoints[j].y - TopPoints[i].y) * (TopPoints[j].x - TopPoints[i].x) < point.x))
+            inside = !inside;
+        j = i;
     }
-
-
     return inside;
 }
+
+
 
 //Конструктор по умолчанию
 Figure::Figure(const std::vector<Point> toppoints, const std::vector<Point> bottompoints, const double Phi, const int order) {

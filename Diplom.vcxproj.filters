@@ -38,9 +38,6 @@
     <Text Include="Grid.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="Square.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
     <Text Include="Porosity.txt">
       <Filter>Resource Files</Filter>
     </Text>
@@ -48,6 +45,9 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="Log.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Volume.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

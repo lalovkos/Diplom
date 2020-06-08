@@ -1,325 +1,325 @@
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0511766
+TimePassed  = 0.0209215
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0529394
+TimePassed  = 0.0230325
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0336596
+TimePassed  = 0.0178318
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0307457
+TimePassed  = 0.016174
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.033274
+TimePassed  = 0.0144163
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0281967
+TimePassed  = 0.0127369
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0316677
+TimePassed  = 0.0183737
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0370832
+TimePassed  = 0.0138846
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0430499
+TimePassed  = 0.0124974
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0471281
+TimePassed  = 0.0112396
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0419323
+TimePassed  = 0.012969
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0506754
+TimePassed  = 0.0135933
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0460241
+TimePassed  = 0.0123781
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0464921
+TimePassed  = 0.0108305
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0418104
+TimePassed  = 0.0126278
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0479848
+TimePassed  = 0.0143248
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.04751
+TimePassed  = 0.013377
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0548307
+TimePassed  = 0.012652
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0404571
+TimePassed  = 0.0116989
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0431617
+TimePassed  = 0.0126608
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0371195
+TimePassed  = 0.0122312
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0426691
+TimePassed  = 0.0124818
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0440825
+TimePassed  = 0.0115134
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0442465
+TimePassed  = 0.012925
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0477598
+TimePassed  = 0.01409
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0623364
+TimePassed  = 0.0153515
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0458935
+TimePassed  = 0.011639
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0379489
+TimePassed  = 0.0116504
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0394227
+TimePassed  = 0.0131723
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0480983
+TimePassed  = 0.0187037
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0461735
+TimePassed  = 0.0205719
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0413111
+TimePassed  = 0.0185281
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0456853
+TimePassed  = 0.0197257
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0600249
+TimePassed  = 0.0260227
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0583452
+TimePassed  = 0.0276644
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.044269
+TimePassed  = 0.0353601
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0426714
+TimePassed  = 0.0259203
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0485359
+TimePassed  = 0.0237972
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0452577
+TimePassed  = 0.0265778
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0414756
+TimePassed  = 0.0211027
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0388884
+TimePassed  = 0.0283839
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0394009
+TimePassed  = 0.0387437
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0496722
+TimePassed  = 0.0408883
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0510975
+TimePassed  = 0.0393333
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0439399
+TimePassed  = 0.0455771
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0387624
+TimePassed  = 0.0383472
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0381368
+TimePassed  = 0.0403687
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0459304
+TimePassed  = 0.0333955
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0460202
+TimePassed  = 0.0346785
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0497516
+TimePassed  = 0.0246201
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0416624
+TimePassed  = 0.0332659
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0431012
+TimePassed  = 0.0361091
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0511742
+TimePassed  = 0.0416317
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0516791
+TimePassed  = 0.0282973
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0387368
+TimePassed  = 0.0306219
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.047128
+TimePassed  = 0.032676
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0409882
+TimePassed  = 0.0258705
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.041063
+TimePassed  = 0.0300063
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0442163
+TimePassed  = 0.0307196
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0441619
+TimePassed  = 0.0320637
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0522939
+TimePassed  = 0.0461293
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0516871
+TimePassed  = 0.0414862
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0411464
+TimePassed  = 0.0307567
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0351955
+TimePassed  = 0.0298889
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0473239
+TimePassed  = 0.0330609
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0448331
+TimePassed  = 0.0394341
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0366924
+TimePassed  = 0.0327014
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0402888
+TimePassed  = 0.0334991
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0415932
+TimePassed  = 0.0451566
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0472837
+TimePassed  = 0.0598382
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0504859
+TimePassed  = 0.0400281
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0401266
+TimePassed  = 0.0360853
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0415466
+TimePassed  = 0.034579
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0469198
+TimePassed  = 0.0349655
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0441595
+TimePassed  = 0.0406793
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0470472
+TimePassed  = 0.0414822
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0462423
+TimePassed  = 0.0310719
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0379973
+TimePassed  = 0.041558
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0523156
+TimePassed  = 0.0322847
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0497339
+TimePassed  = 0.0303908
 -------------------------2 meth-------------------------------
 CalculatedVolume = 1
 SplitKoef = 10
-TimePassed  = 0.0418731
-SumTime = 3.60739
+TimePassed  = 0.0284332
+SumTime = 2.17673

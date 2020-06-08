@@ -9,6 +9,7 @@
 #define BreakKoeff 10
 #define GridInputFileName "Grid.txt"
 #define FiguresInputFileName "Points.txt"
+#define VolumeFileName "Volume.txt"
 #define LogFileName "Log.txt"
 #define PorosityFileName "Porosity.txt"
 #define ResultsFileName "Stats.txt"
@@ -139,14 +140,6 @@ std::vector<Figure> InputFigures(const char* filename) {
     return tmpvector;
 }
 
-//Не работает
-bool PointInsideVector(std::vector<Point> vect, Point point) {
-    for (int i = 0; i < (int)vect.size() - 1; i++)
-        if (PointInsideTriangle(vect[i], vect[i + 1], vect[(int)vect.size() - 1], point)) return true;
-    return false;
-}
-
-
 //TODO: Добавить и привыкнуть к vector.reserve
 //TODO: Добавить закрытие всех файлов
 //TODO: Добавить НОРМАЛЬНОЕ MinMax начальные значения
@@ -165,6 +158,8 @@ int main() {
 
         std::ofstream StatsFile;
         std::ofstream PorosityFile;
+        std::ofstream VolumeFile;
+        VolumeFile.open(VolumeFileName);
         StatsFile.open(ResultsFileName);
         PorosityFile.open(PorosityFileName);
 
@@ -207,8 +202,7 @@ int main() {
             int halfElementsize = (int)(ElementPolygon.size() / 2);
 
             PorosityFile << "E" << pos << " ";
-            if (pos == 78)
-                cout << " ";
+
             if (firstmeth) {
                 StatsFile << "-----------------------------1 meth---------------------------" << std::endl;
                 for (int i = 0; i < BreakKoeff; i++) {
@@ -295,7 +289,7 @@ int main() {
                                 //Проверяем пересекает ли плоскость граней фигуры наш "столб"
                                 if (!PlaneIntersectLine(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], StartLine, EndLine, &InterPoint)) {
                                     //Проверяем, находится ли точка в пределах фигуры
-                                    if (InterPoint.x > CurFig.getMinMax().first.x && InterPoint.x <= CurFig.getMinMax().second.x)
+                                    if (InterPoint.x >= CurFig.getMinMax().first.x && InterPoint.x <= CurFig.getMinMax().second.x)
                                         //Проверяем, находится ли точка в грани
                                         //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
                                         if (PointInsideTriangle(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], InterPoint) || (PointInsideTriangle(CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], CurFig.getBottomPoints()[sn], InterPoint))) {
@@ -375,6 +369,7 @@ int main() {
                                 }
                             }
                         }
+                        
                         //Считаем оставшийся фоновый обьем
                         for (int mn = 0; mn < Volume[0].interval.size(); mn += 2)
                             Volume[0].Volume += (Volume[0].interval[mn + 1] - Volume[0].interval[mn]) * StepSquare;
@@ -385,11 +380,16 @@ int main() {
 
                 //Считаем получившуюся суммарную пористость и площадь КЭ
                 double porosity = 0, calcVM = 0;
+                int v = 0;
+                VolumeFile << "E" << pos;
                 for (VolumeSt VolumePart : Volume) {
                     porosity += VolumePart.Volume * VolumePart.Phi;
                     calcVM += VolumePart.Volume;
+                    VolumeFile << " V" << v << "="<< VolumePart.Volume;
+                    v++;
                 }
-
+                v = 0;
+                VolumeFile << endl;
                 if (pos % 9 == 0) PorosityFile << "P=" << porosity / calcVM << endl;
                 else PorosityFile << "P=" << porosity / calcVM << "; ";
                 StatsFile << "CalculatedVolume = " << calcVM << std::endl;
