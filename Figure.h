@@ -11,6 +11,7 @@ private:
     std::vector<Point> TopPoints; //Верхние точки фигуры
     std::vector<Point> BottomPoints; //Нижние точки фигуры
     double Phi;                //Пористость
+    double K;
     Point MinPoint, MaxPoint; //Опоясывающий куб
     int Order;
     void UpdateMinMax(void);

@@ -58,6 +58,7 @@ struct VolumeSt {
     std::vector<double> interval;
     double Volume;
     double Phi;
+    double K;
 };
 
 //Ввод сетки - countfilename = "\\inftry.dat", 
@@ -259,12 +260,9 @@ std::vector<Figure> InputFigures(const char* figuresfilename) {
 
 //TODO: Добавить и привыкнуть к vector.reserve
 //TODO: Поменять вывод материалов
-//TODO: Добавить закрытие всех файлов
 //TODO: Добавить НОРМАЛЬНОЕ MinMax начальные значения
 //TODO: Реализовать HeshMap для вывода материалов
 //TODO: Добавить LogFile везде
-//TODO: Испратить !PlaneInter
-//TODO: Убрать бесполезный цикл -- в вводе и переставить на вывод
 //TODO: Исправить поведение по с слоями
 
 //Основная программа
@@ -370,7 +368,7 @@ int main() {
                             int tsn;
                             tfn + 1 < halfElementsize ? tsn = tfn + 1 : tsn = 0;
                             //Проверяем пересекает ли плоскость грани наш "столб"
-                            if (!PlaneIntersectLine(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn + halfElementsize], StartLine, EndLine, &InterPoint)) {
+                            if (PlaneIntersectLine(ElementPolygon[tfn], ElementPolygon[tsn], ElementPolygon[tfn + halfElementsize], StartLine, EndLine, &InterPoint)) {
                                 //Проверяем, находится ли точка в пределах элемента
                                 if (InterPoint.x >= MinPoint.x && InterPoint.x <= MaxPoint.x)
                                     //Проверяем, находится ли точка в грани
@@ -399,9 +397,9 @@ int main() {
                                 int sn;
                                 fn + 1 < fnp ? sn = fn + 1 : sn = 0;
                                 //Проверяем пересекает ли плоскость граней фигуры наш "столб"
-                                if (!PlaneIntersectLine(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], StartLine, EndLine, &InterPoint)) {
+                                if (PlaneIntersectLine(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], StartLine, EndLine, &InterPoint)) {
                                     //Проверяем, находится ли точка в пределах фигуры
-                                    if (InterPoint.x > CurFig.getMinMax().first.x && InterPoint.x <= CurFig.getMinMax().second.x)
+                                    if (InterPoint.x >= CurFig.getMinMax().first.x && InterPoint.x <= CurFig.getMinMax().second.x)
                                         //Проверяем, находится ли точка в грани
                                         //TODO: Переделать методом триангуляции, перенести в PointInsidePolygon
                                         if (PointInsideTriangle(CurFig.getTopPoints()[fn], CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], InterPoint) || (PointInsideTriangle(CurFig.getTopPoints()[sn], CurFig.getBottomPoints()[fn], CurFig.getBottomPoints()[sn], InterPoint))) {

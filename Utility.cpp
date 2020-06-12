@@ -53,7 +53,7 @@ bool PlaneIntersectLine(const Point A, const Point B, const Point C, const Point
     Point rv, N, V, W;
     double e, d;
 
-    bool Intersect = true;
+    bool Intersect = false;
     N = VectorProduct(CreateVector(A, B), CreateVector(A, C));
     Normalize(N);
     V = CreateVector(X, A);
@@ -67,7 +67,7 @@ bool PlaneIntersectLine(const Point A, const Point B, const Point C, const Point
         rv.x = X.x + W.x * d / e;
         rv.y = X.y + W.y * d / e;
         rv.z = X.z + W.z * d / e;
-        Intersect = false;
+        Intersect = true;
     }
     *InterPoint = rv;
     return Intersect;
