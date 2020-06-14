@@ -6,7 +6,7 @@
 #include "Utility.h"
 #include <time.h>
 
-#define BreakKoeff 10
+#define BreakKoeff 40
 #define GridInputFileName "Grid.txt"
 #define FiguresInputFileName "Points.txt"
 #define VolumeFileName "Volume.txt"
@@ -148,7 +148,7 @@ std::vector<Figure> InputFigures(const char* filename) {
 //Основная программа
 int main() {
     try{ 
-        bool firstmeth = false;
+        bool firstmeth = true;
         double tick;
         LogFile.open(LogFileName);
         Timer TimePassed;
@@ -229,14 +229,21 @@ int main() {
                     porosity += VolumePart.Volume * VolumePart.Phi;
                     calcVM += VolumePart.Volume;
                 }
-                if (pos % 9 == 0) PorosityFile << "P=" << porosity / calcVM << endl;
-                else PorosityFile << "P=" << porosity / calcVM << "; ";
                 int i = 0;
                 for (VolumeSt VolumePart : Volume) {
                     //PorosityFile << "F" << i << "V=" << VolumePart.Volume << std::endl;
                     i++;
                 }
-
+                int v = 0;
+                VolumeFile << "E" << pos;
+                for (VolumeSt VolumePart : Volume) {
+                    porosity += VolumePart.Volume * VolumePart.Phi;
+                    calcVM += VolumePart.Volume;
+                    VolumeFile << " V" << v << "=" << VolumePart.Volume;
+                    v++;
+                }
+                v = 0;
+                VolumeFile << endl;
                 StatsFile << "CalculatedVolume = " << calcVM << std::endl;
                 StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
                 StatsFile << "TimePassed = " << TimePassed.getTime() - tick << std::endl;
@@ -399,7 +406,7 @@ int main() {
             }
             ElementPolygon.clear();
         }
-        StatsFile << "SumTime = " << TimePassed.getTime();
+        LogFile << "SumTime = " << TimePassed.getTime() << endl;
         LogFile << "Success";
     }
     catch (int ErrorCode) {

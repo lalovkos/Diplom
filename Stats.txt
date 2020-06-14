@@ -1,325 +1,324 @@
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0209215
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0230325
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0178318
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.016174
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0144163
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0127369
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0183737
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0138846
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0124974
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0112396
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.012969
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0135933
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0123781
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0108305
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0126278
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0143248
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.013377
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.012652
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0116989
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0126608
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0122312
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0124818
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0115134
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.012925
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.01409
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0153515
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.011639
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0116504
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0131723
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0187037
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0205719
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0185281
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0197257
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0260227
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0276644
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0353601
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0259203
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0237972
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0265778
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0211027
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0283839
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0387437
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0408883
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0393333
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0455771
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0383472
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0403687
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0333955
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0346785
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0246201
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0332659
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0361091
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0416317
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0282973
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0306219
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.032676
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0258705
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0300063
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0307196
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0320637
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0461293
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0414862
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0307567
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0298889
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0330609
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0394341
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0327014
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0334991
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0451566
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0598382
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0400281
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0360853
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.034579
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0349655
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0406793
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0414822
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0310719
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.041558
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0322847
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0303908
--------------------------2 meth-------------------------------
-CalculatedVolume = 1
-SplitKoef = 10
-TimePassed  = 0.0284332
-SumTime = 2.17673
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.18724
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.14907
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.1735
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.17058
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.2209
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.27829
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.22251
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.22882
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.20456
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.12828
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.25882
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.25335
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.26169
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.05013
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.724022
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.584377
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.969072
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.21314
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.19955
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.49141
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.75547
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.867455
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.520185
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.480796
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.488642
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.508069
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.19438
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.27142
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.30251
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.12939
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.740064
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.488608
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.461304
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.459916
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.502247
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.1971
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.13724
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.20856
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.881742
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.632374
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.453202
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.440493
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.446006
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.639585
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.19223
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.11795
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.0067
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.807456
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.622282
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.435887
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.442896
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.445658
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.83202
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.14243
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.10588
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.840087
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.81796
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.623084
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.437474
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.437777
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.448909
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.15402
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.16595
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.04439
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.897802
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.809673
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.633238
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.435202
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.440756
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 0.473505
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.20737
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.1411
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.11282
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.15089
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.10534
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.0743
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.2241
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.21921
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.23864
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.21306
+-----------------------------1 meth---------------------------
+CalculatedVolume = 2000
+SplitKoef = 40
+TimePassed = 1.14333
