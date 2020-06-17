@@ -75,8 +75,7 @@ bool Figure::PointInside(const Point point) {
     bool inside = false;
 
     //ѕроверка на попадание в опо€сывающий куб
-    if (point.x > MaxPoint.x || point.y > MaxPoint.y || point.z > MaxPoint.z)
-        if (point.x < MinPoint.x || point.y < MinPoint.y || point.z < MinPoint.z)
+    if (point.x > MaxPoint.x || point.y > MaxPoint.y || point.z > MaxPoint.z || point.x < MinPoint.x || point.y < MinPoint.y || point.z < MinPoint.z)
             return false;
 
     Point InterPoint;

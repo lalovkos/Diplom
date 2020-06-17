@@ -6,7 +6,7 @@
 #include "Utility.h"
 #include <time.h>
 
-#define BreakKoeff 40
+#define BreakKoeff 10
 #define GridInputFileName "Grid.txt"
 #define FiguresInputFileName "Points.txt"
 #define VolumeFileName "Volume.txt"
@@ -148,7 +148,7 @@ std::vector<Figure> InputFigures(const char* filename) {
 //ќсновна€ программа
 int main() {
     try{ 
-        bool firstmeth = true;
+        bool firstmeth = false;
         double tick;
         LogFile.open(LogFileName);
         Timer TimePassed;
@@ -201,8 +201,6 @@ int main() {
             double StepSquare = Step.y * Step.z;
             int halfElementsize = (int)(ElementPolygon.size() / 2);
 
-            PorosityFile << "E" << pos << " ";
-
             if (firstmeth) {
                 StatsFile << "-----------------------------1 meth---------------------------" << std::endl;
                 for (int i = 0; i < BreakKoeff; i++) {
@@ -222,32 +220,6 @@ int main() {
                     }
                 }
 
-
-                //—читаем получившуюс€ суммарную пористость и площадь  Ё
-                double porosity = 0, calcVM = 0;
-                for (VolumeSt VolumePart : Volume) {
-                    porosity += VolumePart.Volume * VolumePart.Phi;
-                    calcVM += VolumePart.Volume;
-                }
-                int i = 0;
-                for (VolumeSt VolumePart : Volume) {
-                    //PorosityFile << "F" << i << "V=" << VolumePart.Volume << std::endl;
-                    i++;
-                }
-                int v = 0;
-                VolumeFile << "E" << pos;
-                for (VolumeSt VolumePart : Volume) {
-                    porosity += VolumePart.Volume * VolumePart.Phi;
-                    calcVM += VolumePart.Volume;
-                    VolumeFile << " V" << v << "=" << VolumePart.Volume;
-                    v++;
-                }
-                v = 0;
-                VolumeFile << endl;
-                StatsFile << "CalculatedVolume = " << calcVM << std::endl;
-                StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
-                StatsFile << "TimePassed = " << TimePassed.getTime() - tick << std::endl;
-                tick = TimePassed.getTime();
             }
 
             if (!firstmeth) {
@@ -384,26 +356,30 @@ int main() {
                             Volume[i].interval.clear();
                     }
                 }
-
-                //—читаем получившуюс€ суммарную пористость и площадь  Ё
-                double porosity = 0, calcVM = 0;
-                int v = 0;
-                VolumeFile << "E" << pos;
-                for (VolumeSt VolumePart : Volume) {
-                    porosity += VolumePart.Volume * VolumePart.Phi;
-                    calcVM += VolumePart.Volume;
-                    VolumeFile << " V" << v << "="<< VolumePart.Volume;
-                    v++;
-                }
-                v = 0;
-                VolumeFile << endl;
-                if (pos % 9 == 0) PorosityFile << "P=" << porosity / calcVM << endl;
-                else PorosityFile << "P=" << porosity / calcVM << "; ";
-                StatsFile << "CalculatedVolume = " << calcVM << std::endl;
-                StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
-                StatsFile << "TimePassed  = " << TimePassed.getTime() - tick << std::endl;
-                tick = TimePassed.getTime();
             }
+
+
+            //—читаем получившуюс€ суммарную пористость и площадь  Ё
+            double porosity = 0, calcVM = 0;
+            int v = 0;
+           /* VolumeFile << "E" << pos;*/
+            for (VolumeSt VolumePart : Volume) {
+                porosity += VolumePart.Volume * VolumePart.Phi;
+                calcVM += VolumePart.Volume;
+                VolumeFile << " V" << v << "=" << VolumePart.Volume;
+                v++;
+            }
+            v = 0;
+            VolumeFile << endl;
+            if (pos % 9 == 0) PorosityFile << porosity / calcVM << endl;
+            else PorosityFile << porosity / calcVM << "; ";
+            StatsFile << "CalculatedVolume = " << calcVM << std::endl;
+            StatsFile << "SplitKoef = " << BreakKoeff << std::endl;
+            StatsFile << "TimePassed  = " << TimePassed.getTime() - tick << std::endl;
+
+            tick = TimePassed.getTime();
+
+
             ElementPolygon.clear();
         }
         LogFile << "SumTime = " << TimePassed.getTime() << endl;
